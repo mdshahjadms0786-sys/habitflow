@@ -1,0 +1,109 @@
+# # Logs
+# logs
+# *.log
+# npm-debug.log*
+# yarn-debug.log*
+# yarn-error.log*
+# pnpm-debug.log*
+# lerna-debug.log*
+
+# node_modules
+# dist
+# dist-ssr
+# *.local
+
+# # Editor directories and files
+# .vscode/*
+# !.vscode/extensions.json
+# .idea
+# .DS_Store
+# *.suo
+# *.ntvs*
+# *.njsproj
+# *.sln
+# *.sw?
+# .env
+# .env.production
+
+# # AI directories
+# .claude
+# claude.code/
+# .codex
+# .cursor
+# .obsidian
+# .agent/
+# .copilot/
+# .serena/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules
+.npm
+
+# Build output
+dist
+dist-ssr
+*.local
+
+# Environment files — IMPORTANT: never push these
+.env
+.env.local
+.env.production
+.env.development
+.env.staging
+*.env
+
+# Editor directories
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# AI Tool directories
+.claude
+claude.code/
+.codex
+.cursor
+.obsidian
+.agent/
+.copilot/
+.serena/
+.aider*
+.continue/
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.DS_Store
+
+# Cache
+.cache
+.parcel-cache
+.eslintcache
+*.tsbuildinfo
+
+# Supabase
+.supabase/
+
+# Scripts output
+scripts/generate-icons.js
+
+# Sensitive files
+*.pem
+*.key
+*.cert
+secrets.json

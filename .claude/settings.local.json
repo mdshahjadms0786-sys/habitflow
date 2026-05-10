@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(pkill -f \"vite\")",
+      "Bash(pkill -f vite)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npx eslint *)",
+      "Bash(npm view *)"
+    ]
+  }
+}
