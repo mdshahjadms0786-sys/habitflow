@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext'
 import { HabitProvider } from './context/HabitContext'
 import { MoodProvider } from './context/MoodContext'
 import { TimerProvider } from './context/TimerContext'
+import { PlanProvider } from './context/PlanContext'
 import ErrorBoundary from './components/UI/ErrorBoundary'
 import { applyTheme, getCurrentTheme } from './utils/themeUtils'
 import './index.css'
@@ -12,15 +13,17 @@ applyTheme(getCurrentTheme());
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ErrorBoundary>
-    <AuthProvider>
-      <HabitProvider>
-        <MoodProvider>
-          <TimerProvider>
-            <App />
-          </TimerProvider>
-        </MoodProvider>
-      </HabitProvider>
-    </AuthProvider>
+    <PlanProvider>
+      <AuthProvider>
+        <HabitProvider>
+          <MoodProvider>
+            <TimerProvider>
+              <App />
+            </TimerProvider>
+          </MoodProvider>
+        </HabitProvider>
+      </AuthProvider>
+    </PlanProvider>
   </ErrorBoundary>
 )
 

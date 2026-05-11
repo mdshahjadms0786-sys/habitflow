@@ -44,8 +44,14 @@ const habitReducer = (state, action) => {
   switch (action.type) {
     case 'ADD_HABIT': {
       const maxHabits = getMaxHabits();
-      if (state.habits.length >= maxHabits && !isPro()) {
-        toast.error(`Free plan allows ${maxHabits} habits. Upgrade to Pro for unlimited!`);
+      const activeHabits = state.habits.filter(h => h.isActive !== false);
+
+      if (activeHabits.length >= maxHabits) {
+        if (isPro()) {
+          toast.error(`You've reached your limit of ${maxHabits} active habits. Pause or delete some to add new ones.`);
+        } else {
+          toast.error(`Free plan allows only ${maxHabits} habits. Upgrade to Pro for unlimited!`);
+        }
         return state;
       }
       const newHabits = [...state.habits, action.payload];

@@ -1,14 +1,34 @@
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
-
-const navItems = [
-  { path: '/', label: 'Dashboard', icon: '📊' },
-  { path: '/habits', label: 'Habits', icon: '✅' },
-  { path: '/stats', label: 'Analytics', icon: '📈' },
-  { path: '/settings', label: 'Settings', icon: '⚙️' },
-];
+import { usePlanContext } from '../../context/PlanContext';
 
 export const Navbar = () => {
+  const { isPro: isUserPro, isElite: isUserElite } = usePlanContext();
+
+  const getNavItems = () => {
+    const baseItems = [
+      { path: '/', label: 'Home', icon: '📊' },
+      { path: '/habits', label: 'Habits', icon: '✅' },
+      { path: '/stats', label: 'Stats', icon: '📈' },
+    ];
+
+    if (isUserPro) {
+      return [
+        ...baseItems,
+        { path: '/focus', label: 'Focus', icon: '⏱️' },
+        { path: '/settings', label: 'More', icon: '⚙️' },
+      ];
+    }
+
+    return [
+      ...baseItems,
+      { path: '/achievements', label: 'Badges', icon: '🏅' },
+      { path: '/settings', label: 'Settings', icon: '⚙️' },
+    ];
+  };
+
+  const navItems = getNavItems();
+
   return (
     <nav
       style={{

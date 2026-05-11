@@ -21,7 +21,7 @@ const LifeAreasPage = () => {
   const navigate = useNavigate();
   const [scores, setScores] = useState({});
   
-  const canAccess = hasFeature('life_areas');
+  const canAccess = hasFeature('lifeAreas');
   
   useEffect(() => {
     if (habits && habits.length > 0) {

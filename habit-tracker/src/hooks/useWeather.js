@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getUserLocation, fetchWeather, getCachedWeather, saveWeather, getWeatherAdvice } from '../utils/weatherUtils';
 
 export const useWeather = (habits = []) => {
@@ -6,6 +6,7 @@ export const useWeather = (habits = []) => {
   const [advice, setAdvice] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const habitsLengthRef = useRef(habits.length);
 
   const fetchWeatherData = async () => {
     setIsLoading(true);
@@ -38,7 +39,13 @@ export const useWeather = (habits = []) => {
   };
 
   useEffect(() => {
-    fetchWeatherData();
+    if (habits.length !== habitsLengthRef.current) {
+      habitsLengthRef.current = habits.length;
+      const cached = getCachedWeather();
+      if (cached) {
+        setAdvice(getWeatherAdvice(cached, habits));
+      }
+    }
   }, [habits]);
 
   return { weather, advice, isLoading, error, refresh: fetchWeatherData };

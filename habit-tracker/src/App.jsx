@@ -51,6 +51,17 @@ import TimerWidget from './components/Timer/TimerWidget';
 import SyncStatus from './components/Auth/SyncStatus';
 import HelpButton from './components/UI/HelpButton';
 import { usePWA } from './hooks/usePWA';
+import AIHabitArchitectPage from './pages/AIHabitArchitectPage';
+import LifeOSDashboardPage from './pages/LifeOSDashboardPage';
+import PredictiveAIPage from './pages/PredictiveAIPage';
+import SmartInterventionPage from './pages/SmartInterventionPage';
+import MonthlyBehaviorReportPage from './pages/MonthlyBehaviorReportPage';
+import HabitROIDashboardPage from './pages/HabitROIDashboardPage';
+import HabitTwinPage from './pages/HabitTwinPage';
+import WeeklyEmailPage from './pages/WeeklyEmailPage';
+import DNAEvolutionPage from './pages/DNAEvolutionPage';
+import WhiteGloveOnboardingPage from './pages/WhiteGloveOnboardingPage';
+import EliteDashboardPage from './pages/EliteDashboardPage';
 
 function AppContent() {
   const { darkMode } = useHabitContext();
@@ -139,7 +150,7 @@ function AppContent() {
         )}
 
         <main
-          className="desktop-main-content main-content"
+          className={hideNavigation ? 'main-content' : 'desktop-main-content main-content'}
           style={{
             flex: 1,
             paddingBottom: '80px',
@@ -160,7 +171,7 @@ function AppContent() {
             <Route path="/settings" element={<Settings />} />
             <Route path="/mood" element={<PlanGuard requiredPlan="pro"><MoodPage /></PlanGuard>} />
             <Route path="/ai-coach" element={<AICoachPage />} />
-            <Route path="/ai-coaching" element={<AICoachingPage />} />
+            <Route path="/ai-coaching" element={<PlanGuard requiredPlan="elite"><AICoachingPage /></PlanGuard>} />
             <Route path="/focus" element={<PlanGuard requiredPlan="pro"><FocusPage /></PlanGuard>} />
             <Route path="/focus-history" element={<FocusHistoryPage />} />
             <Route path="/breathing" element={<BreathingPage />} />
@@ -182,6 +193,17 @@ function AppContent() {
             <Route path="/habit/:habitId/stats" element={<HabitStatsPage />} />
             <Route path="/help" element={<HelpPage />} />
             <Route path="/weekly-report" element={<WeeklyReportPage />} />
+            <Route path="/elite" element={<PlanGuard requiredPlan="elite"><EliteDashboardPage /></PlanGuard>} />
+            <Route path="/ai-architect" element={<PlanGuard requiredPlan="elite"><AIHabitArchitectPage /></PlanGuard>} />
+            <Route path="/life-os" element={<PlanGuard requiredPlan="elite"><LifeOSDashboardPage /></PlanGuard>} />
+            <Route path="/predictive" element={<PlanGuard requiredPlan="elite"><PredictiveAIPage /></PlanGuard>} />
+            <Route path="/intervention" element={<PlanGuard requiredPlan="elite"><SmartInterventionPage /></PlanGuard>} />
+            <Route path="/behavior-report" element={<PlanGuard requiredPlan="elite"><MonthlyBehaviorReportPage /></PlanGuard>} />
+            <Route path="/habit-roi" element={<PlanGuard requiredPlan="elite"><HabitROIDashboardPage /></PlanGuard>} />
+            <Route path="/habit-twin" element={<PlanGuard requiredPlan="elite"><HabitTwinPage /></PlanGuard>} />
+            <Route path="/weekly-email" element={<PlanGuard requiredPlan="elite"><WeeklyEmailPage /></PlanGuard>} />
+            <Route path="/dna-evolution" element={<PlanGuard requiredPlan="elite"><DNAEvolutionPage /></PlanGuard>} />
+            <Route path="/white-glove" element={<PlanGuard requiredPlan="elite"><WhiteGloveOnboardingPage /></PlanGuard>} />
           </Routes>
           
           <FocusMiniPlayer />

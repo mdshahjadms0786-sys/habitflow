@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { loadProfile } from '../../utils/profileUtils';
 import PlanBadge from '../UI/PlanBadge';
-import { isPro, isElite, getMaxHabits } from '../../utils/planUtils';
+import { usePlanContext } from '../../context/PlanContext';
 import { useHabits } from '../../hooks/useHabits';
 
 const bottomItems = [
@@ -16,6 +16,7 @@ export const Sidebar = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState({ name: '', avatarEmoji: '👤' });
   const { habits } = useHabits();
+  const { isPro: isUserPro, isElite: isUserElite, limits, hasFeature } = usePlanContext();
 
   useEffect(() => {
     const loaded = loadProfile();
@@ -23,52 +24,95 @@ export const Sidebar = () => {
   }, []);
 
   const getNavItems = () => {
-    const isUserPro = isPro();
-    const isUserElite = isElite();
     const activeHabitsCount = habits.filter(h => h.isActive !== false).length;
-    const maxHabits = getMaxHabits();
+    const maxHabits = limits.maxHabits;
 
-    const allHabitsLabel = !isUserPro 
-      ? `All Habits (${activeHabitsCount}/${maxHabits})` 
+    const allHabitsLabel = !isUserPro
+      ? `All Habits (${activeHabitsCount}/${maxHabits})`
       : 'All Habits';
 
     if (!isUserPro) {
       return [
         { path: '/', label: 'Dashboard', icon: '📊' },
         { path: '/habits', label: allHabitsLabel, icon: '✅' },
-        { path: '/stats', label: 'Analytics', icon: '📈' }
+        { path: '/stats', label: 'Analytics', icon: '📈' },
+        { path: '/achievements', label: 'Achievements', icon: '🏅' },
+        { path: '/settings', label: 'Settings', icon: '⚙️' },
+      ];
+    }
+
+    if (isUserElite) {
+      return [
+        { path: '/', label: 'Dashboard', icon: '📊' },
+        { path: '/elite', label: '👑 Elite Hub', icon: '👑', feature: null, elite: true },
+        { path: '/habits', label: 'All Habits', icon: '✅' },
+        { path: '/ai-architect', label: 'AI Architect', icon: '🏗️', feature: 'aiHabitArchitect' },
+        { path: '/life-os', label: 'Life OS', icon: '🖥️', feature: 'lifeOSDashboard' },
+        { path: '/predictive', label: 'Predictive AI', icon: '🔮', feature: 'predictiveAI' },
+        { path: '/intervention', label: 'Interventions', icon: '🚨', feature: 'smartIntervention' },
+        { path: '/habit-stacks', label: 'Habit Stacks', icon: '🔗', feature: 'habitStacks' },
+        { path: '/ai-coach', label: 'AI Coach', icon: '🤖', feature: 'aiCoach' },
+        { path: '/ai-coaching', label: 'AI Life Coach', icon: '👑', feature: 'aiCoachPro' },
+        { path: '/focus', label: 'Focus Mode', icon: '⏱️', feature: 'focusMode' },
+        { path: '/mood', label: 'Mood', icon: '😊', feature: 'moodTracking' },
+        { path: '/journal', label: 'Journal', icon: '📖', feature: 'journal' },
+        { path: '/life-score', label: 'Life Score', icon: '🎯', feature: 'lifeScore' },
+        { path: '/life-areas', label: 'Life Areas', icon: '🗺️', feature: 'lifeAreas' },
+        { path: '/goals', label: 'Goals', icon: '🎯', feature: 'goals' },
+        { path: '/vision-board', label: 'Vision Board', icon: '🖼️', feature: 'visionBoard' },
+        { path: '/stats', label: 'Analytics', icon: '📈' },
+        { path: '/calendar', label: 'Calendar', icon: '📅' },
+        { path: '/focus-history', label: 'Focus Stats', icon: '📊', feature: 'focusHistory' },
+        { path: '/breathing', label: 'Breathe', icon: '💨', feature: 'breathingExercises' },
+        { path: '/schedule', label: 'Schedule', icon: '📅', feature: 'schedule' },
+        { path: '/experiments', label: 'Experiments', icon: '🔬', feature: 'experiments' },
+        { path: '/newspaper', label: 'Daily News', icon: '📰', feature: 'newspaper' },
+        { path: '/timeline', label: 'Journey', icon: '🕰️', feature: 'timeline' },
+        { path: '/bets', label: 'Bets', icon: '💰', feature: 'betting' },
+        { path: '/leagues', label: 'Leagues', icon: '🏅', feature: 'leagues' },
+        { path: '/achievements', label: 'Achievements', icon: '🏅' },
+        { path: '/certifications', label: 'Certifications', icon: '🏆', feature: 'certifications' },
+        { path: '/challenge', label: 'Challenge', icon: '🏆' },
+        { path: '/burnout', label: 'Wellbeing', icon: '🌿', feature: 'burnoutTracker' },
+        { path: '/behavior-report', label: 'Behavior Report', icon: '🧬', feature: 'monthlyBehaviorReport' },
+        { path: '/habit-roi', label: 'Habit ROI', icon: '💰', feature: 'habitROIDashboard' },
+        { path: '/habit-twin', label: 'Habit Twin', icon: '👥', feature: 'habitTwin' },
+        { path: '/weekly-email', label: 'Weekly Email', icon: '📧', feature: 'weeklyEmail' },
+        { path: '/dna-evolution', label: 'DNA Evolution', icon: '🧬', feature: 'dnaEvolution' },
+        { path: '/white-glove', label: 'White Glove', icon: '🎯', feature: 'whiteGloveOnboarding' },
+        { path: '/widgets', label: 'Share', icon: '🖼️', feature: 'widgets' },
+        { path: '/weekly-report', label: 'Weekly Report', icon: '📊' },
       ];
     }
 
     const proItems = [
       { path: '/', label: 'Dashboard', icon: '📊' },
-      { path: '/mood', label: 'Mood', icon: '😊' },
       { path: '/habits', label: 'All Habits', icon: '✅' },
-      { path: '/habit-stacks', label: 'Habit Stacks', icon: '🔗' },
-      { path: '/ai-coach', label: 'AI Coach', icon: '🤖' },
-      ...(isUserElite ? [{ path: '/ai-coaching', label: 'AI Life Coach', icon: '👑' }] : []),
+      { path: '/habit-stacks', label: 'Habit Stacks', icon: '🔗', feature: 'habitStacks' },
+      { path: '/ai-coach', label: 'AI Coach', icon: '🤖', feature: 'aiCoach' },
+      ...(isUserElite ? [{ path: '/ai-coaching', label: 'AI Life Coach', icon: '👑', feature: 'aiCoachPro' }] : []),
+      { path: '/focus', label: 'Focus Mode', icon: '⏱️', feature: 'focusMode' },
+      { path: '/mood', label: 'Mood', icon: '😊', feature: 'moodTracking' },
+      { path: '/journal', label: 'Journal', icon: '📖', feature: 'journal' },
+      { path: '/life-score', label: 'Life Score', icon: '🎯', feature: 'lifeScore' },
+      { path: '/life-areas', label: 'Life Areas', icon: '🗺️', feature: 'lifeAreas' },
+      { path: '/goals', label: 'Goals', icon: '🎯', feature: 'goals' },
+      { path: '/vision-board', label: 'Vision Board', icon: '🖼️', feature: 'visionBoard' },
       { path: '/stats', label: 'Analytics', icon: '📈' },
-      { path: '/life-score', label: 'Life Score', icon: '🎯' },
-      { path: '/life-areas', label: 'Life Areas', icon: '🗺️' },
-      { path: '/goals', label: 'Goals', icon: '🎯' },
-      { path: '/focus', label: 'Focus Mode', icon: '⏱️' },
-      { path: '/focus-history', label: 'Focus Stats', icon: '📊' },
-      { path: '/breathing', label: 'Breathe', icon: '💨' },
       { path: '/calendar', label: 'Calendar', icon: '📅' },
-      { path: '/journal', label: 'Journal', icon: '📖' },
-      { path: '/vision-board', label: 'Vision Board', icon: '🖼️' },
-      { path: '/schedule', label: 'Schedule', icon: '📅' },
-      { path: '/experiments', label: 'Experiments', icon: '🔬' },
-      { path: '/newspaper', label: 'Daily News', icon: '📰' },
-      { path: '/dream-diary', label: 'Dream Diary', icon: '💭' },
-      { path: '/timeline', label: 'Journey', icon: '🕰️' },
-      { path: '/bets', label: 'Bets', icon: '💰' },
-      { path: '/leagues', label: 'Leagues', icon: '🏅' },
+      { path: '/focus-history', label: 'Focus Stats', icon: '📊', feature: 'focusHistory' },
+      { path: '/breathing', label: 'Breathe', icon: '💨', feature: 'breathingExercises' },
+      { path: '/schedule', label: 'Schedule', icon: '📅', feature: 'schedule' },
+      { path: '/experiments', label: 'Experiments', icon: '🔬', feature: 'experiments' },
+      { path: '/newspaper', label: 'Daily News', icon: '📰', feature: 'newspaper' },
+      { path: '/timeline', label: 'Journey', icon: '🕰️', feature: 'timeline' },
+      { path: '/bets', label: 'Bets', icon: '💰', feature: 'betting' },
+      { path: '/leagues', label: 'Leagues', icon: '🏅', feature: 'leagues' },
       { path: '/achievements', label: 'Achievements', icon: '🏅' },
-      { path: '/certifications', label: 'Certifications', icon: '🏆' },
+      { path: '/certifications', label: 'Certifications', icon: '🏆', feature: 'certifications' },
       { path: '/challenge', label: 'Challenge', icon: '🏆' },
-      { path: '/burnout', label: 'Wellbeing', icon: '🌿' },
-      { path: '/widgets', label: 'Share', icon: '🖼️' },
+      { path: '/burnout', label: 'Wellbeing', icon: '🌿', feature: 'burnoutTracker' },
+      { path: '/widgets', label: 'Share', icon: '🖼️', feature: 'widgets' },
       { path: '/weekly-report', label: 'Weekly Report', icon: '📊' },
     ];
 
@@ -220,7 +264,7 @@ export const Sidebar = () => {
         ))}
       </nav>
 
-      {!isPro() && (
+      {!isUserPro && (
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

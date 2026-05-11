@@ -26,7 +26,7 @@ const GoalsPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState(null);
   
-  const canAccess = hasFeature('goals_system');
+  const canAccess = hasFeature('goals');
   
   useEffect(() => {
     setGoals(loadSmartGoals());

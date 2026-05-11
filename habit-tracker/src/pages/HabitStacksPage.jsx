@@ -16,7 +16,7 @@ const HabitStacksPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingStack, setEditingStack] = useState(null);
   
-  const canAccess = hasFeature('habit_stacks');
+  const canAccess = hasFeature('habitStacks');
   
   useEffect(() => {
     const loadedStacks = loadStacks();

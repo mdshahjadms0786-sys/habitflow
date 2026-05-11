@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { v4 as uuidv4 } from 'uuid';
 import { getTodayISO } from '../../utils/dateUtils';
 import toast from 'react-hot-toast';
-import { isPro, getMaxHabits } from '../../utils/planUtils';
+import { isPro, isElite, getMaxHabits, ELITE_HABIT_PACKS } from '../../utils/planUtils';
 import { useNavigate } from 'react-router-dom';
 
 const TEMPLATE_PACKS = [
@@ -476,8 +476,20 @@ const HabitTemplates = ({ onAddTemplate, currentHabitsCount = 0 }) => {
   const [expandedPack, setExpandedPack] = useState(null);
   const navigate = useNavigate();
   const pro = isPro();
+  const elite = isElite();
   const maxAllowed = getMaxHabits();
-  const allowedPacks = pro ? TEMPLATE_PACKS : TEMPLATE_PACKS.slice(0, 3);
+  const allPacks = elite ? [...TEMPLATE_PACKS, ...ELITE_HABIT_PACKS] : TEMPLATE_PACKS;
+  
+  const getAccessiblePackCount = () => {
+    if (elite) return 45;
+    if (pro) return 30;
+    return 3;
+  };
+  
+  const accessibleCount = getAccessiblePackCount();
+  const allowedPacks = allPacks;
+  
+  const isPackAccessible = (index) => index < accessibleCount;
 
   const searchResults = useMemo(() => {
     if (!searchQuery || searchQuery.length < 2) return { found: [], generated: null };
@@ -553,9 +565,22 @@ const HabitTemplates = ({ onAddTemplate, currentHabitsCount = 0 }) => {
 
   return (
     <div style={{ marginBottom: '24px' }}>
-      <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: 600, color: 'var(--text)' }}>
-        Habit Templates ({allowedPacks.length} packs)
-      </h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600, color: 'var(--text)' }}>
+          Habit Templates ({allowedPacks.length} packs)
+        </h3>
+        <div style={{
+          padding: '6px 12px',
+          background: currentHabitsCount >= maxAllowed ? '#EF444420' : '#10B98120',
+          borderRadius: '20px',
+          fontSize: '12px',
+          fontWeight: 600,
+          color: currentHabitsCount >= maxAllowed ? '#EF4444' : '#10B981'
+        }}>
+          {currentHabitsCount}/{maxAllowed} habits used
+          {!pro && ' (Free Plan)'}
+        </div>
+      </div>
       
       <div style={{ position: 'relative', marginBottom: '16px' }}>
         <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '16px' }}>🔍</span>
@@ -672,122 +697,197 @@ const HabitTemplates = ({ onAddTemplate, currentHabitsCount = 0 }) => {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
         gap: '8px',
       }}>
-        {allowedPacks.map((pack) => (
-          <motion.div
-            key={pack.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{
-              border: `1px solid ${pack.color}33`,
-              borderRadius: '12px',
-              overflow: 'hidden',
-              background: pack.color + '14',
-            }}
-          >
-            <div
+        {allowedPacks.map((pack, index) => {
+          const isAccessible = isPackAccessible(index);
+          return (
+            <motion.div
+              key={pack.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               style={{
-                padding: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                cursor: 'pointer',
+                border: `1px solid ${isAccessible ? pack.color + '33' : '#9CA3AF33'}`,
+                borderRadius: '12px',
+                overflow: 'hidden',
+                background: isAccessible ? pack.color + '14' : '#9CA3AF14',
+                opacity: isAccessible ? 1 : 0.7,
+                position: 'relative',
               }}
-              onClick={() => setExpandedPack(expandedPack === pack.id ? null : pack.id)}
             >
-              <span style={{ fontSize: '22px' }}>{pack.icon}</span>
-              <div style={{ flex: 1 }}>
-                <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a' }}>
-                  {pack.name}
-                </span>
-              </div>
-              <span style={{ fontSize: '11px', color: '#666' }}>5 habits</span>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addAllFromPack(pack);
-                }}
-                style={{
-                  background: pack.color,
+              {!isAccessible && (
+                <div style={{
+                  position: 'absolute',
+                  top: '8px',
+                  right: '8px',
+                  background: '#EF4444',
                   color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '5px 10px',
-                  fontSize: '11px',
+                  padding: '2px 8px',
+                  borderRadius: '4px',
+                  fontSize: '10px',
                   fontWeight: 600,
+                  zIndex: 10,
+                }}>
+                  🔒 LOCKED
+                </div>
+              )}
+              <div
+                style={{
+                  padding: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
                   cursor: 'pointer',
                 }}
+                onClick={() => isAccessible && setExpandedPack(expandedPack === pack.id ? null : pack.id)}
               >
-                Add All
-              </motion.button>
-              <span style={{ color: '#666', fontSize: '11px' }}>
-                {expandedPack === pack.id ? '▲' : '▼'}
-              </span>
-            </div>
-            
-            <AnimatePresence>
-              {expandedPack === pack.id && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  style={{ overflow: 'hidden' }}
-                >
-                  <div style={{ padding: '0 12px 12px' }}>
-                    {pack.habits.map((habit, idx) => (
-                      <div
-                        key={idx}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          padding: '8px 0',
-                          borderBottom: idx < pack.habits.length - 1 ? '1px solid var(--border)' : 'none',
-                        }}
-                      >
-                        <span style={{ fontSize: '16px', marginRight: '8px' }}>{habit.icon}</span>
-                        <div style={{ flex: 1 }}>
-                          <span style={{ fontSize: '13px', color: 'var(--text)' }}>
-                            {habit.name}
-                          </span>
-                        </div>
-                        <span style={{ marginRight: '6px', fontSize: '9px', padding: '2px 5px', borderRadius: '3px', background: difficultyColors[habit.difficulty] + '20', color: difficultyColors[habit.difficulty], fontWeight: 600 }}>
-                          {habit.difficulty}
-                        </span>
-                        <span style={{ marginRight: '6px', fontSize: '9px', color: '#10B981', fontWeight: 600 }}>
-                          +{habit.points}
-                        </span>
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            addHabit(habit, pack.name);
-                          }}
+                <span style={{ fontSize: '22px' }}>{pack.icon}</span>
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a' }}>
+                    {pack.name}
+                  </span>
+                </div>
+                <span style={{ fontSize: '11px', color: '#666' }}>5 habits</span>
+                {(() => {
+                  const remaining = maxAllowed - currentHabitsCount;
+                  const canAdd = isAccessible && remaining >= pack.habits.length;
+                  return (
+                    <motion.button
+                      whileHover={canAdd ? { scale: 1.05 } : {}}
+                      whileTap={canAdd ? { scale: 0.95 } : {}}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!isAccessible) {
+                          navigate('/upgrade');
+                          return;
+                        }
+                        addAllFromPack(pack);
+                      }}
+                      disabled={!canAdd}
+                      style={{
+                        background: canAdd ? pack.color : '#9CA3AF',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '5px 10px',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        cursor: canAdd ? 'pointer' : 'not-allowed',
+                      }}
+                    >
+                      {canAdd ? 'Add All' : (isAccessible ? 'Limit Reached' : 'Locked')}
+                    </motion.button>
+                  );
+                })()}
+                <span style={{ color: '#666', fontSize: '11px' }}>
+                  {expandedPack === pack.id ? '▲' : '▼'}
+                </span>
+              </div>
+              
+              <AnimatePresence>
+                {expandedPack === pack.id && isAccessible && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    style={{ overflow: 'hidden' }}
+                  >
+                    <div style={{ padding: '0 12px 12px' }}>
+                      {pack.habits.map((habit, idx) => (
+                        <div
+                          key={idx}
                           style={{
-                            background: 'transparent',
-                            border: '1px solid var(--border)',
-                            borderRadius: '5px',
-                            width: '24px',
-                            height: '24px',
-                            cursor: 'pointer',
-                            fontSize: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '8px 0',
+                            borderBottom: idx < pack.habits.length - 1 ? '1px solid var(--border)' : 'none',
                           }}
                         >
-                          +
-                        </motion.button>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        ))}
+                          <span style={{ fontSize: '16px', marginRight: '8px' }}>{habit.icon}</span>
+                          <div style={{ flex: 1 }}>
+                            <span style={{ fontSize: '13px', color: 'var(--text)' }}>
+                              {habit.name}
+                            </span>
+                          </div>
+                          <span style={{ marginRight: '6px', fontSize: '9px', padding: '2px 5px', borderRadius: '3px', background: difficultyColors[habit.difficulty] + '20', color: difficultyColors[habit.difficulty], fontWeight: 600 }}>
+                            {habit.difficulty}
+                          </span>
+                          <span style={{ marginRight: '6px', fontSize: '9px', color: '#10B981', fontWeight: 600 }}>
+                            +{habit.points}
+                          </span>
+                          <motion.button
+                            whileHover={{ scale: isAccessible ? 1.1 : 1 }}
+                            whileTap={{ scale: isAccessible ? 0.9 : 1 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (!isAccessible) {
+                                navigate('/upgrade');
+                                return;
+                              }
+                              addHabit(habit, pack.name);
+                            }}
+                            disabled={!isAccessible}
+                            style={{
+                              background: isAccessible ? 'transparent' : '#9CA3AF',
+                              border: `1px solid ${isAccessible ? 'var(--border)' : '#9CA3AF'}`,
+                              borderRadius: '5px',
+                              width: '24px',
+                              height: '24px',
+                              cursor: isAccessible ? 'pointer' : 'not-allowed',
+                              fontSize: '12px',
+                              opacity: isAccessible ? 1 : 0.5,
+                            }}
+                          >
+                            {isAccessible ? '+' : '🔒'}
+                          </motion.button>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })}
       </div>
+
+      {!elite && pro && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            marginTop: '24px',
+            padding: '24px',
+            background: 'linear-gradient(135deg, #BA751711, #f59e0b11)',
+            border: '1px solid #BA751733',
+            borderRadius: '16px',
+            textAlign: 'center'
+          }}
+        >
+          <div style={{ fontSize: '32px', marginBottom: '12px' }}>👑</div>
+          <h4 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text)', margin: '0 0 8px 0' }}>
+            Unlock Elite Exclusive Habit Packs
+          </h4>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '0 0 20px 0' }}>
+            Get access to advanced packs like CEO Morning Protocol, Navy SEAL Discipline, and more!
+          </p>
+          <button
+            onClick={() => navigate('/upgrade')}
+            style={{
+              background: 'linear-gradient(135deg, #BA7517, #f59e0b)',
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            Upgrade to Elite
+          </button>
+        </motion.div>
+      )}
 
       {!pro && (
         <motion.div
@@ -804,10 +904,10 @@ const HabitTemplates = ({ onAddTemplate, currentHabitsCount = 0 }) => {
         >
           <div style={{ fontSize: '32px', marginBottom: '12px' }}>💎</div>
           <h4 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text)', margin: '0 0 8px 0' }}>
-            Unlock 30+ More Template Packs
+            Upgrade to Pro for Unlimited Habits
           </h4>
           <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '0 0 20px 0' }}>
-            Get access to specialized packs for Business, Travel, Content Creation, Mental Toughness, and more!
+            You're on the FREE plan with limit of {maxAllowed} habits. Upgrade to Pro for unlimited habits and more features!
           </p>
           <button
             onClick={() => navigate('/upgrade')}

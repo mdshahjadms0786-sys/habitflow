@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { getCurrentPlan } from '../../utils/planUtils';
+import { usePlanContext } from '../../context/PlanContext';
 
 const planWeights = {
   free: 0,
@@ -9,15 +9,15 @@ const planWeights = {
 };
 
 const PlanGuard = ({ requiredPlan = 'pro', children }) => {
-  const currentPlan = getCurrentPlan();
-  
+  const { currentPlan, isPro, isElite } = usePlanContext();
+
   const currentWeight = planWeights[currentPlan] || 0;
   const requiredWeight = planWeights[requiredPlan] || 1;
-  
+
   if (currentWeight < requiredWeight) {
     return <Navigate to="/upgrade" replace />;
   }
-  
+
   return children;
 };
 

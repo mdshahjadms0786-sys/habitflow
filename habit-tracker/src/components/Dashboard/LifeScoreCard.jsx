@@ -5,13 +5,33 @@ import { calculateLifeScore } from '../../utils/lifeScoreUtils';
 
 const LifeScoreCard = ({ habits = [], moodLog = {}, compact = true }) => {
   const navigate = useNavigate();
-  const [score, setScore] = useState(null);
+  const [score, setScore] = useState({ overall: 0, grade: 'N/A', physical: { score: 0 }, mental: { score: 0 }, productivity: { score: 0 }, social: { score: 0 } });
 
   useEffect(() => {
-    setScore(calculateLifeScore(habits, moodLog));
+    const calculated = calculateLifeScore(habits, moodLog);
+    if (calculated) {
+      setScore(calculated);
+    } else {
+      setScore({ 
+        overall: 0, 
+        grade: 'N/A', 
+        physical: { score: 0, icon: '💪' },
+        mental: { score: 0, icon: '🧠' },
+        productivity: { score: 0, icon: '💼' },
+        social: { score: 0, icon: '🤝' }
+      });
+    }
   }, [habits, moodLog]);
 
-  if (!score) return null;
+  if (score.overall === 0 && score.grade === 'N/A') {
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+        style={{ background: 'var(--surface)', borderRadius: '12px', padding: '16px', border: '1px solid var(--border)', textAlign: 'center' }}>
+        <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎯</div>
+        <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)' }}>Complete habits to see your Life Score</p>
+      </motion.div>
+    );
+  }
 
   const getColor = (s) => s >= 75 ? '#22c55e' : s >= 50 ? '#EAB308' : '#EF4444';
 
