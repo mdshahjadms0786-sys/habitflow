@@ -33,7 +33,7 @@ export default defineConfig({
   resolve: {
     dedupe: ['react', 'react-dom']
   },
-  base: './',
+  base: '/',
   build: {
     sourcemap: true,
     chunkSizeWarningLimit: 1500,
