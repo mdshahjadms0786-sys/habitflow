@@ -1,3 +1,5 @@
+import logger from './logger'
+
 const CHALLENGE_KEY = 'ht_monthly_challenges';
 
 export const CHALLENGE_TEMPLATES = [
@@ -146,7 +148,7 @@ export const markChallengeCompleted = (challenge) => {
     };
     localStorage.setItem(CHALLENGE_KEY, JSON.stringify(data));
   } catch (e) {
-    console.error('Failed to save challenge:', e);
+    logger.error('Failed to save challenge:', e);
   }
 };
 

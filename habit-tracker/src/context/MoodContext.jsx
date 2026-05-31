@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
+import logger from '../utils/logger';
 import { saveMoodLog, loadMoodLog } from '../utils/db';
 import { getTodayISO } from '../utils/dateUtils';
 import { addPoints } from '../utils/pointsUtils';
@@ -93,7 +94,7 @@ export const MoodProvider = ({ children }) => {
         
         supabase.from('mood_logs').upsert(mappedLogs, { onConflict: 'user_id,date' })
           .then(({ error }) => { 
-            if (error) console.error('Supabase Mood Sync Error:', error); 
+            if (error) logger.error('Supabase Mood Sync Error:', error); 
           });
       }
     }

@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { getTotalPoints } from './pointsUtils';
+import logger from './logger'
 
 const STORAGE_KEY = 'ht_bets';
 
@@ -39,7 +40,7 @@ export const saveBet = (bet) => {
     const updated = [...bets, bet];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   } catch (e) {
-    console.error('Failed to save bet', e);
+    logger.error('Failed to save bet', e);
   }
 };
 
@@ -48,7 +49,7 @@ export const loadBets = () => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch (e) {
-    console.error('Failed to load bets', e);
+    logger.error('Failed to load bets', e);
     return [];
   }
 };
@@ -59,7 +60,7 @@ export const updateBet = (updatedBet) => {
     const updated = bets.map(b => b.id === updatedBet.id ? updatedBet : b);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   } catch (e) {
-    console.error('Failed to update bet', e);
+    logger.error('Failed to update bet', e);
   }
 };
 

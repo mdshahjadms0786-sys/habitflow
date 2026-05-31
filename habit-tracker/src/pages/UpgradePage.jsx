@@ -5,6 +5,7 @@ import { getPlanComparisonData, PLANS } from '../utils/planUtils';
 import toast from 'react-hot-toast';
 import { useRazorpay } from '../hooks/useRazorpay';
 import { useAuthContext } from '../context/AuthContext';
+import logger from '../utils/logger';
 // Payment verification now handled server-side by verify-payment Edge Function
 
 const FAQS = [
@@ -61,7 +62,7 @@ const UpgradePage = () => {
       },
       onError: (error) => {
         toast.error('Payment failed or was cancelled.');
-        console.error(error);
+        logger.error('Payment failed:', error);
       }
     });
   };

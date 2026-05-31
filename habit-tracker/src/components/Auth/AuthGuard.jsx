@@ -1,7 +1,7 @@
 import LoginForm from './LoginForm';
 import { useLocation, Navigate } from 'react-router-dom';
 
-export default function AuthGuard({ children, user, isLoading, onLogin, onSignup, authError }) {
+export default function AuthGuard({ children, user, isLoading, onLogin, onSignup, authError, loginLockRemaining }) {
   const location = useLocation();
 
   if (location.pathname === '/landing') {
@@ -13,6 +13,14 @@ export default function AuthGuard({ children, user, isLoading, onLogin, onSignup
   }
 
   if (location.pathname === '/onboarding') {
+    return children;
+  }
+
+  if (location.pathname === '/forgot-password') {
+    return children;
+  }
+
+  if (location.pathname === '/reset-password') {
     return children;
   }
 
@@ -37,6 +45,7 @@ export default function AuthGuard({ children, user, isLoading, onLogin, onSignup
           onSignup={onSignup}
           isLoading={isLoading}
           error={authError}
+          loginLockRemaining={loginLockRemaining}
         />
       </div>
     );

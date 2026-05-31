@@ -1,3 +1,5 @@
+import logger from './logger'
+
 const STORAGE_KEY = 'ht_emergency_mode';
 
 const PRIORITY_WEIGHTS = {
@@ -33,7 +35,7 @@ export const saveEmergencyMode = (isActive, activatedAt = null) => {
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
-    console.error('Failed to save emergency mode', e);
+    logger.error('Failed to save emergency mode', e);
   }
 };
 
@@ -61,7 +63,7 @@ export const isEmergencyModeActive = () => {
     
     return true;
   } catch (e) {
-    console.error('Failed to check emergency mode', e);
+    logger.error('Failed to check emergency mode', e);
     return false;
   }
 };

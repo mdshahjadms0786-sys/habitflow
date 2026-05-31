@@ -8,6 +8,7 @@ import SubtypeModal from '../components/Habits/SubtypeModal';
 import EmptyState from '../components/UI/EmptyState';
 import OllamaModal from '../components/AI/OllamaModal';
 import { v4 as uuidv4 } from 'uuid';
+import logger from '../utils/logger';
 import { getTodayISO } from '../utils/dateUtils';
 import { categorizeTodayHabits } from '../utils/streakUtils';
 import toast from 'react-hot-toast';
@@ -97,7 +98,7 @@ const AllHabits = () => {
   };
 
   const handleSubtypeComplete = (habitId, subtype) => {
-    console.log('Completed:', habitId, subtype);
+    logger.info('Completed:', { habitId, subtype });
   };
 
   const handleDeleteHabit = (habitId) => {

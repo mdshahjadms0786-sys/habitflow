@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { startOfMonth, endOfMonth, eachDayOfInterval, format, getDay } from 'date-fns';
 
@@ -20,7 +20,7 @@ const darkIntensityColors = {
 
 const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export const MonthlyHeatmap = ({ habits }) => {
+const MonthlyHeatmap = memo(({ habits }) => {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const colors = isDark ? darkIntensityColors : intensityColors;
 
@@ -186,6 +186,6 @@ export const MonthlyHeatmap = ({ habits }) => {
       </div>
     </div>
   );
-};
+});
 
 export default MonthlyHeatmap;

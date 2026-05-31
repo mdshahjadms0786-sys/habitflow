@@ -24,13 +24,15 @@ export const getCategoryInfo = (categoryId) => {
   return VISION_CATEGORIES.find(c => c.id === categoryId) || VISION_CATEGORIES[4];
 };
 
+import logger from './logger'
+
 const STORAGE_KEY = 'ht_visions';
 
 export const saveVisions = (visions) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(visions));
   } catch (e) {
-    console.error('Failed to save visions', e);
+    logger.error('Failed to save visions', e);
   }
 };
 
@@ -39,7 +41,7 @@ export const loadVisions = () => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch (e) {
-    console.error('Failed to load visions', e);
+    logger.error('Failed to load visions', e);
     return [];
   }
 };

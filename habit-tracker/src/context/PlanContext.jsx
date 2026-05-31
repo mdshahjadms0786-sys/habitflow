@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
+import logger from '../utils/logger';
 import { useAuthContext } from './AuthContext';
 import { getUserProfile, updateUserProfile } from '../services/supabaseService';
 import {
@@ -57,20 +59,21 @@ export const PlanProvider = ({ children }) => {
   useEffect(() => {
     const fetchProfile = async () => {
       if (user) {
-        const profile = await getUserProfile(user.id);
+        const { data: profile, error } = await getUserProfile(user.id);
+        if (error) {
+          logger.error('Failed to fetch user profile:', error);
+        }
         if (profile) {
           if (profile.plan) {
-            // If cloud has a plan, use it and update local storage
             setCurrentPlan(profile.plan);
             setPlan(profile.plan);
           }
           if (profile.onboarding_complete) {
-            // Restore onboarding status if they log into a new device
             localStorage.setItem('ht_onboarding_complete', 'true');
           }
-        } else if (user) {
-          // If no profile exists, create one with the current local plan
-          await updateUserProfile(user.id, { plan: currentPlan });
+        } else if (!error && user) {
+          const { error: createError } = await updateUserProfile(user.id, { plan: currentPlan });
+          if (createError) logger.error('Failed to create user profile:', createError);
         }
       }
     };
@@ -98,7 +101,8 @@ export const PlanProvider = ({ children }) => {
     setPlan(planId);
     setCurrentPlan(planId);
     if (user) {
-      await updateUserProfile(user.id, { plan: planId });
+      const { error } = await updateUserProfile(user.id, { plan: planId });
+      if (error) toast.error('Failed to update plan: ' + error);
     }
   }, [user]);
 

@@ -1,15 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { useAuthContext } from '../../context/AuthContext';
 import { loginWithGoogle } from '../../services/supabaseService';
 
-const LoginForm = ({ onLogin, onSignup, isLoading, error }) => {
+const LoginForm = ({ onLogin, onSignup, isLoading, error, loginLockRemaining }) => {
+  const { resendVerification, user } = useAuthContext();
+  const navigate = useNavigate();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [localError, setLocalError] = useState('');
+  const [countdown, setCountdown] = useState(loginLockRemaining || 0);
+  const [showEmailSent, setShowEmailSent] = useState(false);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    setCountdown(loginLockRemaining || 0);
+  }, [loginLockRemaining]);
+
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const timer = setInterval(() => {
+      setCountdown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [countdown]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLocalError('');
 
@@ -24,7 +43,10 @@ const LoginForm = ({ onLogin, onSignup, isLoading, error }) => {
     }
 
     if (isSignUp) {
-      onSignup(email, password);
+      const result = await onSignup(email, password);
+      if (result && !result.error) {
+        setShowEmailSent(true);
+      }
     } else {
       onLogin(email, password);
     }
@@ -135,6 +157,50 @@ const LoginForm = ({ onLogin, onSignup, isLoading, error }) => {
             <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border)' }} />
           </div>
 
+          {showEmailSent && (
+            <div
+              style={{
+                padding: '16px',
+                marginBottom: '20px',
+                borderRadius: '12px',
+                background: '#f0fdf4',
+                border: '1px solid #bbf7d0',
+                color: '#16a34a',
+                fontSize: '14px',
+                textAlign: 'center',
+                lineHeight: '1.5',
+              }}
+            >
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>📧</div>
+              <strong>Check your email</strong>
+              <div style={{ marginTop: '4px', color: '#15803d' }}>
+                Click the verification link to activate your account.
+              </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  const result = await resendVerification(email)
+                  if (!result?.error) {
+                    toast.success('Verification email resent!')
+                  }
+                }}
+                style={{
+                  marginTop: '12px',
+                  background: 'none',
+                  border: '1px solid #bbf7d0',
+                  color: '#16a34a',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Resend verification email
+              </button>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: '16px' }}>
               <label
@@ -202,6 +268,25 @@ const LoginForm = ({ onLogin, onSignup, isLoading, error }) => {
               />
             </div>
 
+            {!isSignUp && (
+              <div style={{ textAlign: 'right', marginBottom: '16px' }}>
+                <button
+                  type="button"
+                  onClick={() => navigate('/forgot-password')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--primary)',
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
+
             {isSignUp && (
               <div style={{ marginBottom: '16px' }}>
                 <label
@@ -237,6 +322,23 @@ const LoginForm = ({ onLogin, onSignup, isLoading, error }) => {
               </div>
             )}
 
+            {countdown > 0 && (
+              <div
+                style={{
+                  padding: '12px',
+                  marginBottom: '16px',
+                  borderRadius: '8px',
+                  backgroundColor: '#fff7ed',
+                  border: '1px solid #fed7aa',
+                  color: '#c2410c',
+                  fontSize: '13px',
+                  textAlign: 'center',
+                }}
+              >
+                Too many attempts. Retry in {countdown}s
+              </div>
+            )}
+
             {displayError && (
               <div
                 style={{
@@ -250,6 +352,26 @@ const LoginForm = ({ onLogin, onSignup, isLoading, error }) => {
                 }}
               >
                 {displayError}
+                {displayError.toLowerCase().includes('email not confirmed') && (
+                  <div style={{ marginTop: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => resendVerification(email)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#dc2626',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        padding: 0,
+                      }}
+                    >
+                      Resend verification email
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -257,7 +379,7 @@ const LoginForm = ({ onLogin, onSignup, isLoading, error }) => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || countdown > 0}
               style={{
                 width: '100%',
                 padding: '14px',
@@ -268,10 +390,10 @@ const LoginForm = ({ onLogin, onSignup, isLoading, error }) => {
                 fontSize: '15px',
                 fontWeight: '600',
                 cursor: isLoading ? 'not-allowed' : 'pointer',
-                opacity: isLoading ? 0.6 : 1,
+                opacity: isLoading || countdown > 0 ? 0.6 : 1,
               }}
             >
-              {isLoading ? 'Loading...' : isSignUp ? 'Create Account' : 'Sign In'}
+              {countdown > 0 ? `Wait ${countdown}s` : isLoading ? 'Loading...' : isSignUp ? 'Create Account' : 'Sign In'}
             </motion.button>
           </form>
 

@@ -8,6 +8,7 @@ import { addPoints, checkAndAwardStreakBonus, checkAndAwardPerfectDay } from '..
 import { calculatePointsForCompletion, getDifficultyLevel } from '../utils/difficultyUtils';
 import { getMaxHabits, isPro } from '../utils/planUtils';
 import toast from 'react-hot-toast';
+import logger from '../utils/logger';
 import { useAuthContext } from './AuthContext';
 import { supabase } from '../services/supabaseClient';
 
@@ -250,7 +251,7 @@ export const HabitProvider = ({ children }) => {
       
       supabase.from('habits').upsert(mappedHabits, { onConflict: 'id' })
         .then(({ error }) => { 
-          if (error) console.error('Supabase Sync Error:', error); 
+          if (error) logger.error('Supabase Sync Error:', error); 
         });
     }
   }, [state.habits, user]);

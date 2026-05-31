@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import logger from './logger'
 
 const STORAGE_KEY = 'ht_dream_diary';
 
@@ -9,7 +10,7 @@ export const saveDiaryEntry = (entry) => {
     updated.push({ ...entry, id: entry.id || uuidv4() });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated.slice(0, 60)));
   } catch (e) {
-    console.error('Failed to save diary entry', e);
+    logger.error('Failed to save diary entry', e);
   }
 };
 
@@ -18,7 +19,7 @@ export const loadDiaryEntries = () => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch (e) {
-    console.error('Failed to load diary entries', e);
+    logger.error('Failed to load diary entries', e);
     return [];
   }
 };

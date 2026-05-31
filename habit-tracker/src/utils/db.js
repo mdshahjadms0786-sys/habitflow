@@ -1,3 +1,5 @@
+import logger from './logger'
+
 const HABITS_KEY = 'habit-tracker-habits';
 const SETTINGS_KEY = 'habit-tracker-settings';
 const MOOD_KEY = 'ht_moodlog';
@@ -10,7 +12,7 @@ export const saveRecentEmojis = (emojis) => {
     localStorage.setItem(RECENT_EMOJIS_KEY, JSON.stringify(emojis));
     return true;
   } catch (error) {
-    console.error('Failed to save recent emojis:', error);
+    logger.error('Failed to save recent emojis:', error);
     return false;
   }
 };
@@ -20,7 +22,7 @@ export const loadRecentEmojis = () => {
     const data = localStorage.getItem(RECENT_EMOJIS_KEY);
     return data ? JSON.parse(data) : [];
   } catch (error) {
-    console.error('Failed to load recent emojis:', error);
+    logger.error('Failed to load recent emojis:', error);
     return [];
   }
 };
@@ -30,8 +32,8 @@ export const saveHabits = (habits) => {
     localStorage.setItem(HABITS_KEY, JSON.stringify(habits));
     return true;
   } catch (error) {
-    console.error('Failed to save habits:', error);
-    return false;
+    logger.error('Failed to save habits:', error);
+
   }
 };
 
@@ -44,7 +46,7 @@ export const loadHabits = () => {
     const parsed = JSON.parse(data);
     return Array.isArray(parsed) ? parsed.filter((h) => h != null) : [];
   } catch (error) {
-    console.error('Failed to load habits:', error);
+    logger.error('Failed to load habits:', error);
     return [];
   }
 };
@@ -54,7 +56,7 @@ export const saveSettings = (settings) => {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     return true;
   } catch (error) {
-    console.error('Failed to save settings:', error);
+    logger.error('Failed to save settings:', error);
     return false;
   }
 };
@@ -66,7 +68,7 @@ export const loadSettings = () => {
       ? JSON.parse(data)
       : { darkMode: false, showMotivation: true };
   } catch (error) {
-    console.error('Failed to load settings:', error);
+    logger.error('Failed to load settings:', error);
     return { darkMode: false, showMotivation: true };
   }
 };
@@ -76,7 +78,7 @@ export const saveMoodLog = (moodLog) => {
     localStorage.setItem(MOOD_KEY, JSON.stringify(moodLog));
     return true;
   } catch (error) {
-    console.error('Failed to save mood log:', error);
+    logger.error('Failed to save mood log:', error);
     return false;
   }
 };
@@ -88,7 +90,7 @@ export const loadMoodLog = () => {
     const parsed = JSON.parse(data);
     return typeof parsed === 'object' && parsed !== null ? parsed : {};
   } catch (error) {
-    console.error('Failed to load mood log:', error);
+    logger.error('Failed to load mood log:', error);
     return {};
   }
 };
@@ -101,7 +103,7 @@ export const clearAllData = () => {
     localStorage.removeItem(TIMER_SESSIONS_KEY);
     return true;
   } catch (error) {
-    console.error('Failed to clear data:', error);
+    logger.error('Failed to clear data:', error);
     return false;
   }
 };
@@ -111,7 +113,7 @@ export const saveTimerSessions = (data) => {
     localStorage.setItem(TIMER_SESSIONS_KEY, JSON.stringify(data));
     return true;
   } catch (error) {
-    console.error('Failed to save timer sessions:', error);
+    logger.error('Failed to save timer sessions:', error);
     return false;
   }
 };

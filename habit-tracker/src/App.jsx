@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useHabitContext } from './context/HabitContext';
@@ -6,42 +6,7 @@ import { useAuthContext } from './context/AuthContext';
 import AuthGuard from './components/Auth/AuthGuard';
 import AuthCallback from './components/Auth/AuthCallback';
 import PlanGuard from './components/Auth/PlanGuard';
-import Dashboard from './pages/Dashboard';
-import AllHabits from './pages/AllHabits';
-import Analytics from './pages/Analytics';
-import Achievements from './pages/Achievements';
-import ChallengePage from './pages/ChallengePage';
-import Settings from './pages/Settings';
-import MoodPage from './pages/MoodPage';
-import AICoachPage from './pages/AICoachPage';
-import LandingPage from './pages/LandingPage';
-import CalendarPage from './pages/CalendarPage';
-import JournalPage from './pages/JournalPage';
-import FocusPage from './pages/FocusPage';
-import FocusHistoryPage from './pages/FocusHistoryPage';
-import BreathingPage from './pages/BreathingPage';
-import LifeScorePage from './pages/LifeScorePage';
-import VisionBoardPage from './pages/VisionBoardPage';
-import SchedulePage from './pages/SchedulePage';
-import ExperimentsPage from './pages/ExperimentsPage';
-import NewspaperPage from './pages/NewspaperPage';
-import DreamDiaryPage from './pages/DreamDiaryPage';
-import TimelinePage from './pages/TimelinePage';
-import BetsPage from './pages/BetsPage';
-import BurnoutPage from './pages/BurnoutPage';
-import WidgetsPage from './pages/WidgetsPage';
-import OnboardingPage from './pages/OnboardingPage';
-import ProfilePage from './pages/ProfilePage';
-import UpgradePage from './pages/UpgradePage';
-import CertificationsPage from './pages/CertificationsPage';
-import HabitStatsPage from './pages/HabitStatsPage';
-import HelpPage from './pages/HelpPage';
-import WeeklyReportPage from './pages/WeeklyReportPage';
-import AICoachingPage from './pages/AICoachingPage';
-import HabitStacksPage from './pages/HabitStacksPage';
-import LifeAreasPage from './pages/LifeAreasPage';
-import GoalsPage from './pages/GoalsPage';
-import LeaguesPage from './pages/LeaguesPage';
+// Layout & utility components (not lazy — always needed)
 import FocusMiniPlayer from './components/Focus/FocusMiniPlayer';
 import Sidebar from './components/Layout/Sidebar';
 import Navbar from './components/Layout/Navbar';
@@ -52,18 +17,79 @@ import TimerWidget from './components/Timer/TimerWidget';
 import SyncStatus from './components/Auth/SyncStatus';
 import HelpButton from './components/UI/HelpButton';
 import { usePWA } from './hooks/usePWA';
-import AIHabitArchitectPage from './pages/AIHabitArchitectPage';
-import LifeOSDashboardPage from './pages/LifeOSDashboardPage';
-import PredictiveAIPage from './pages/PredictiveAIPage';
-import SmartInterventionPage from './pages/SmartInterventionPage';
-import MonthlyBehaviorReportPage from './pages/MonthlyBehaviorReportPage';
-import HabitROIDashboardPage from './pages/HabitROIDashboardPage';
-import HabitTwinPage from './pages/HabitTwinPage';
-import WeeklyEmailPage from './pages/WeeklyEmailPage';
-import DNAEvolutionPage from './pages/DNAEvolutionPage';
-import WhiteGloveOnboardingPage from './pages/WhiteGloveOnboardingPage';
-import EliteDashboardPage from './pages/EliteDashboardPage';
-import PointsPage from './pages/PointsPage';
+// Lazy-loaded pages grouped by feature
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const AllHabits = lazy(() => import('./pages/AllHabits'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+const Achievements = lazy(() => import('./pages/Achievements'));
+const ChallengePage = lazy(() => import('./pages/ChallengePage'));
+const Settings = lazy(() => import('./pages/Settings'));
+const MoodPage = lazy(() => import('./pages/MoodPage'));
+const AICoachPage = lazy(() => import('./pages/AICoachPage'));
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const CalendarPage = lazy(() => import('./pages/CalendarPage'));
+const JournalPage = lazy(() => import('./pages/JournalPage'));
+const FocusPage = lazy(() => import('./pages/FocusPage'));
+const FocusHistoryPage = lazy(() => import('./pages/FocusHistoryPage'));
+const BreathingPage = lazy(() => import('./pages/BreathingPage'));
+const LifeScorePage = lazy(() => import('./pages/LifeScorePage'));
+const VisionBoardPage = lazy(() => import('./pages/VisionBoardPage'));
+const SchedulePage = lazy(() => import('./pages/SchedulePage'));
+const ExperimentsPage = lazy(() => import('./pages/ExperimentsPage'));
+const NewspaperPage = lazy(() => import('./pages/NewspaperPage'));
+const DreamDiaryPage = lazy(() => import('./pages/DreamDiaryPage'));
+const TimelinePage = lazy(() => import('./pages/TimelinePage'));
+const BetsPage = lazy(() => import('./pages/BetsPage'));
+const BurnoutPage = lazy(() => import('./pages/BurnoutPage'));
+const WidgetsPage = lazy(() => import('./pages/WidgetsPage'));
+const OnboardingPage = lazy(() => import('./pages/OnboardingPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const UpgradePage = lazy(() => import('./pages/UpgradePage'));
+const CertificationsPage = lazy(() => import('./pages/CertificationsPage'));
+const HabitStatsPage = lazy(() => import('./pages/HabitStatsPage'));
+const HelpPage = lazy(() => import('./pages/HelpPage'));
+const WeeklyReportPage = lazy(() => import('./pages/WeeklyReportPage'));
+const AICoachingPage = lazy(() => import('./pages/AICoachingPage'));
+const HabitStacksPage = lazy(() => import('./pages/HabitStacksPage'));
+const LifeAreasPage = lazy(() => import('./pages/LifeAreasPage'));
+const GoalsPage = lazy(() => import('./pages/GoalsPage'));
+const LeaguesPage = lazy(() => import('./pages/LeaguesPage'));
+const AIHabitArchitectPage = lazy(() => import('./pages/AIHabitArchitectPage'));
+const LifeOSDashboardPage = lazy(() => import('./pages/LifeOSDashboardPage'));
+const PredictiveAIPage = lazy(() => import('./pages/PredictiveAIPage'));
+const SmartInterventionPage = lazy(() => import('./pages/SmartInterventionPage'));
+const MonthlyBehaviorReportPage = lazy(() => import('./pages/MonthlyBehaviorReportPage'));
+const HabitROIDashboardPage = lazy(() => import('./pages/HabitROIDashboardPage'));
+const HabitTwinPage = lazy(() => import('./pages/HabitTwinPage'));
+const WeeklyEmailPage = lazy(() => import('./pages/WeeklyEmailPage'));
+const DNAEvolutionPage = lazy(() => import('./pages/DNAEvolutionPage'));
+const WhiteGloveOnboardingPage = lazy(() => import('./pages/WhiteGloveOnboardingPage'));
+const EliteDashboardPage = lazy(() => import('./pages/EliteDashboardPage'));
+const PointsPage = lazy(() => import('./pages/PointsPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
+
+const PageLoading = () => (
+  <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '60vh',
+    color: 'var(--text-secondary)',
+    fontSize: '14px',
+    gap: '12px',
+  }}>
+    <div style={{
+      width: '20px',
+      height: '20px',
+      border: '2px solid var(--border)',
+      borderTopColor: 'var(--primary)',
+      borderRadius: '50%',
+      animation: 'spin 0.8s linear infinite',
+    }} />
+    Loading...
+  </div>
+);
 
 function AppContent() {
   const { darkMode } = useHabitContext();
@@ -130,6 +156,29 @@ function AppContent() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [navigate, isTyping]);
 
+  useEffect(() => {
+    const initCapacitor = async () => {
+      try {
+        const { SplashScreen } = await import('@capacitor/splash-screen')
+        await SplashScreen.hide()
+      } catch {}
+      try {
+        const { App } = await import('@capacitor/app')
+        await App.addListener('backButton', ({ canGoBack }) => {
+          if (canGoBack) {
+            navigate(-1)
+          } else {
+            const confirmed = window.confirm('Exit HabitFlow?')
+            if (confirmed) {
+              App.exitApp()
+            }
+          }
+        })
+      } catch {}
+    }
+    initCapacitor()
+  }, [navigate])
+
   return (
     <div
       className={darkMode ? 'dark' : ''}
@@ -160,6 +209,7 @@ function AppContent() {
             paddingBottom: '80px',
           }}
         >
+          <Suspense fallback={<PageLoading />}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
@@ -209,9 +259,12 @@ function AppContent() {
             <Route path="/weekly-email" element={<PlanGuard requiredPlan="elite"><WeeklyEmailPage /></PlanGuard>} />
             <Route path="/dna-evolution" element={<PlanGuard requiredPlan="elite"><DNAEvolutionPage /></PlanGuard>} />
             <Route path="/white-glove" element={<PlanGuard requiredPlan="elite"><WhiteGloveOnboardingPage /></PlanGuard>} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/login" element={<Navigate to="/settings" replace />} />
             <Route path="/points" element={<PointsPage />} />
           </Routes>
+          </Suspense>
           
           <FocusMiniPlayer />
         </main>
@@ -258,7 +311,7 @@ function AppContent() {
 }
 
 function AppWithRouter() {
-  const { user, isLoading: authLoading, login, signup, authError } = useAuthContext();
+  const { user, isLoading: authLoading, login, signup, authError, loginLockRemaining } = useAuthContext();
   
   return (
     <AuthGuard
@@ -267,6 +320,7 @@ function AppWithRouter() {
       onLogin={login}
       onSignup={signup}
       authError={authError}
+      loginLockRemaining={loginLockRemaining}
     >
       <AppContent />
     </AuthGuard>

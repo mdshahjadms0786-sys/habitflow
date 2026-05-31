@@ -4,7 +4,8 @@ import { useHabitContext } from '../context/HabitContext';
 import { useMoodContext } from '../context/MoodContext';
 import { hasFeature } from '../utils/planUtils';
 import { streamCompletion } from '../utils/ollamaService';
-import { 
+import logger from '../utils/logger'
+import {
   COACH_PERSONALITIES, 
   getCoachPersonality, 
   saveCoachPersonality, 
@@ -368,7 +369,7 @@ const CoachingSessionModal = ({ isOpen, onClose, habits, onSessionSaved, persona
           setStep(3);
         },
         (error) => {
-          console.error('AI error:', error);
+          logger.error('AI error:', error);
           generateEliteFallback(context, habits, pers, (chunk) => {
             setAiResponse(prev => {
               const next = prev + chunk;

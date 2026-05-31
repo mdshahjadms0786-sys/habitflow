@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react'
 import { supabase, configuredSupabaseUrl } from '../services/supabaseClient'
 
 let lastRateLimit = 0
@@ -110,27 +111,31 @@ export const getCompletion = async (prompt) => {
   const now = Date.now()
   if (now - lastRateLimit < 15000) return null
 
-  const result = await callGeminiProxy({ prompt, action: 'chat' })
-  if (result.error) return null
-  return result.data.text || null
+  return Sentry.startSpan({ name: 'getCompletion', op: 'ai.coach' }, async () => {
+    const result = await callGeminiProxy({ prompt, action: 'chat' })
+    if (result.error) return null
+    return result.data.text || null
+  })
 }
 
 export const getHabitSuggestions = async (userGoal) => {
-  const result = await callGeminiProxy({ prompt: userGoal, action: 'suggestions' })
-  if (result.error) return null
+  return Sentry.startSpan({ name: 'getHabitSuggestions', op: 'ai.coach' }, async () => {
+    const result = await callGeminiProxy({ prompt: userGoal, action: 'suggestions' })
+    if (result.error) return null
 
-  const text = result.data.text || ''
-  const jsonMatch = text.match(/\[[\s\S]*\]/)
-  if (jsonMatch) {
-    const suggestions = JSON.parse(jsonMatch[0])
-    return suggestions.map((s) => ({
-      ...s,
-      category: validateCategory(s.category),
-      priority: validatePriority(s.priority),
-    }))
-  }
+    const text = result.data.text || ''
+    const jsonMatch = text.match(/\[[\s\S]*\]/)
+    if (jsonMatch) {
+      const suggestions = JSON.parse(jsonMatch[0])
+      return suggestions.map((s) => ({
+        ...s,
+        category: validateCategory(s.category),
+        priority: validatePriority(s.priority),
+      }))
+    }
 
-  return null
+    return null
+  })
 }
 
 export const getDailyMotivation = async (stats) => {

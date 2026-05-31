@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { subDays, format } from 'date-fns';
 
-export const CompletionBarChart = ({ habits }) => {
+const CompletionBarChart = memo(({ habits }) => {
   const data = useMemo(() => {
     const last7Days = Array.from({ length: 7 }, (_, i) => {
       const date = subDays(new Date(), 6 - i);
@@ -87,6 +87,6 @@ export const CompletionBarChart = ({ habits }) => {
       </ResponsiveContainer>
     </div>
   );
-};
+});
 
 export default CompletionBarChart;

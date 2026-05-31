@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
@@ -14,7 +15,7 @@ const bottomItems = [
   { path: '/settings', label: 'Settings', icon: '⚙️' },
 ];
 
-export const Sidebar = () => {
+const Sidebar = memo(() => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState({ name: '', avatarEmoji: '👤' });
   const { habits } = useHabits();

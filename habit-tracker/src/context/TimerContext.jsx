@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
+import logger from '../utils/logger';
 import { useHabitContext } from './HabitContext';
 import { getTodayISO } from '../utils/dateUtils';
 import { saveTimerSessions, loadTimerSessions } from '../utils/db';
@@ -164,7 +165,11 @@ export const TimerProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      fetchFocusSessions(user.id).then(data => {
+      fetchFocusSessions(user.id).then(({ data, error }) => {
+        if (error) {
+          logger.error('Failed to fetch focus sessions:', error);
+          return;
+        }
         if (data && data.length > 0) {
           const mappedSessions = data.map(s => ({
             id: s.id,
@@ -175,7 +180,6 @@ export const TimerProvider = ({ children }) => {
           const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
           if (mappedSessions.length > existing.length) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(mappedSessions));
-            // Just fetching into local storage for now, let ADD_FOCUS_SESSION append locally
           }
         }
       });
@@ -277,7 +281,9 @@ export const TimerProvider = ({ children }) => {
         habitId: sessionData.habitId,
         duration: sessionData.duration,
         date: sessionData.date
-      }, user.id).catch(err => console.error('Failed to sync focus session:', err));
+      }, user.id).then(({ error }) => {
+        if (error) logger.error('Failed to sync focus session:', error);
+      });
     }
   }, [state.activeHabitId, state.activeHabitName, state.activeHabitIcon, user]);
 

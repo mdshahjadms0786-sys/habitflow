@@ -1,4 +1,5 @@
 import { format, subDays, startOfWeek, endOfWeek, isSunday } from 'date-fns';
+import logger from './logger'
 
 const REVIEW_SHOWN_KEY = 'ht_review_shown';
 
@@ -155,6 +156,6 @@ export const markReviewShown = (weekStart) => {
   try {
     localStorage.setItem(REVIEW_SHOWN_KEY, JSON.stringify({ weekStart, timestamp: new Date().toISOString() }));
   } catch (e) {
-    console.error('Failed to mark review as shown:', e);
+    logger.error('Failed to mark review as shown:', e);
   }
 };

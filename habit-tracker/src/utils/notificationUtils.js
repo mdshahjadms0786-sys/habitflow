@@ -1,3 +1,5 @@
+import logger from './logger'
+
 const NOTIFICATIONS_ENABLED_KEY = 'ht_notifications_enabled';
 const reminderTimeouts = new Map();
 
@@ -19,7 +21,7 @@ export const requestNotificationPermission = async () => {
     const result = await Notification.requestPermission();
     return result === 'granted';
   } catch (e) {
-    console.error('Error requesting notification permission:', e);
+    logger.error('Error requesting notification permission:', e);
     return false;
   }
 };
@@ -36,7 +38,7 @@ export const sendNotification = (title, body, icon) => {
       tag: title,
     });
   } catch (e) {
-    console.error('Error sending notification:', e);
+    logger.error('Error sending notification:', e);
   }
 };
 
@@ -114,6 +116,6 @@ export const setNotificationsEnabled = (enabled) => {
   try {
     localStorage.setItem(NOTIFICATIONS_ENABLED_KEY, String(enabled));
   } catch (e) {
-    console.error('Error saving notification preference:', e);
+    logger.error('Error saving notification preference:', e);
   }
 };

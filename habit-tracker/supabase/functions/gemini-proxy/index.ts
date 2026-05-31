@@ -32,16 +32,22 @@ serve(async (req) => {
     const baseUrl = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}`
 
     if (action === 'check' || action === 'status') {
-      const resp = await fetch(`${baseUrl}?key=${geminiKey}`, { signal: AbortSignal.timeout(5000) })
+      const resp = await fetch(baseUrl, {
+        headers: { Authorization: `Bearer ${geminiKey}` },
+        signal: AbortSignal.timeout(5000),
+      })
       return new Response(JSON.stringify({ isRunning: resp.ok, models: ['gemini-2.5-flash-lite'] }), { status: 200 })
     }
 
     const useStream = req.headers.get('Accept') === 'text/event-stream'
 
     if (useStream) {
-      const resp = await fetch(`${baseUrl}:streamGenerateContent?alt=sse&key=${geminiKey}`, {
+      const resp = await fetch(`${baseUrl}:streamGenerateContent?alt=sse`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${geminiKey}`,
+        },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
@@ -101,9 +107,12 @@ serve(async (req) => {
       geminiPrompt = `Give one short motivational sentence (max 15 words) for someone who has completed ${stats?.completedToday || 0}/${stats?.totalHabits || 0} habits today and has a ${stats?.bestStreak || 0} day streak.`
     }
 
-    const resp = await fetch(`${baseUrl}:generateContent?key=${geminiKey}`, {
+    const resp = await fetch(`${baseUrl}:generateContent`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${geminiKey}`,
+      },
       body: JSON.stringify({
         contents: [{ parts: [{ text: geminiPrompt }] }],
         generationConfig: { temperature: 0.7, maxOutputTokens: maxTokens },

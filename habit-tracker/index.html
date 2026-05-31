@@ -14,6 +14,49 @@
     <meta name="apple-mobile-web-app-title" content="HabitFlow" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
     <meta name="mobile-web-app-capable" content="yes" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://checkout.razorpay.com https://accounts.google.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://checkout.razorpay.com https://accounts.google.com https://generativelanguage.googleapis.com; frame-src https://checkout.razorpay.com https://accounts.google.com; manifest-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none';"><｜end▁of▁thinking｜>**2B: Service Worker — already has origin validation.** The current `sw.js` at lines 102-107 already protects against open redirect:
+
+```js
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/';
+  if (!url.startsWith(self.location.origin)) return;  // ✅ origin check
+  event.waitUntil(clients.openWindow(url));
+});
+```
+
+No changes needed — this is already correct.
+
+**2C: Gemini Proxy — already uses Bearer token, not `?key=`.**
+
+All 3 fetch calls in `supabase/functions/gemini-proxy/index.ts` already use `Authorization: Bearer ${geminiKey}`:
+- Line 36: status/check endpoint
+- Line 49: streaming endpoint
+- Line 114: generateContent endpoint
+
+No changes needed — already correct.
+
+**2D: Supabase Auth Rate Limiting — Dashboard Instructions**
+
+Here are the exact settings to configure in your Supabase dashboard:
+
+1. Go to **Dashboard → Authentication → Settings → Rate Limiting**
+2. Set these values:
+
+| Setting | Recommended Value | Notes |
+|---------|------------------|-------|
+| **Sign-up rate limit** | `5 / 300s` (5 per 5 min) | Prevents mass account creation |
+| **Sign-in rate limit** | `5 / 300s` | Matches client-side 3-attempt lockout |
+| **Token refresh rate limit** | `10 / 60s` | Allows reasonable token refresh |
+| **Send magic link email** | `3 / 300s` | Prevents email flooding |
+| **Password reset request** | `3 / 300s` | Prevents password reset spam |
+| **Verify OTP rate limit** | `5 / 300s` | Standard OTP protection |
+
+3. Click **Save**
+
+<｜｜DSML｜｜tool_calls>
+<｜｜DSML｜｜invoke name="todowrite">
+<｜｜DSML｜｜parameter name="todos" string="false">[{"content":"Section 1: Fix AuthGuard to allow /forgot-password and /reset-password for unauthenticated users","priority":"high","status":"completed"},{"content":"Section 1: Add persistent 'Check your email' message after signup in LoginForm","priority":"medium","status":"completed"},{"content":"Section 2A: Enhance CSP meta tag in index.html","priority":"high","status":"completed"},{"content":"Section 2B: Confirm/verify SW open redirect fix in sw.js","priority":"high","status":"completed"},{"content":"Section 2C: Verify Gemini proxy uses Authorization header (not ?key=)","priority":"high","status":"completed"},{"content":"Section 2D: Provide Supabase Auth rate limiting instructions","priority":"medium","status":"completed"}]
   </head>
   <body>
     <div id="root"></div>

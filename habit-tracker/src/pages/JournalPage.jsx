@@ -9,6 +9,7 @@ import { exportJournalAsText, saveJournalEntry as saveToLocalJournal } from '../
 import { getHabitJournal } from '../utils/journalUtils';
 import { analyzeSentiment } from '../utils/sentimentUtils';
 import toast from 'react-hot-toast';
+import logger from '../utils/logger';
 import { addPoints } from '../utils/pointsUtils';
 import { useAuthContext } from '../context/AuthContext';
 import { fetchJournalEntries } from '../services/supabaseService';
@@ -19,11 +20,17 @@ const JournalPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
   const [activeTab, setActiveTab] = useState('write');
+  const [syncing, setSyncing] = useState(true);
   const { user } = useAuthContext();
 
   useEffect(() => {
     if (user) {
-      fetchJournalEntries(user.id).then(data => {
+      fetchJournalEntries(user.id).then(({ data, error }) => {
+        setSyncing(false);
+        if (error) {
+          logger.error('Failed to fetch journal entries:', error);
+          return;
+        }
         if (data && data.length > 0) {
           data.forEach(entry => {
             saveToLocalJournal(entry.habit_id, entry.date, entry.entry_text);
@@ -31,6 +38,8 @@ const JournalPage = () => {
           setRefreshKey(prev => prev + 1);
         }
       });
+    } else {
+      setSyncing(false);
     }
   }, [user]);
 
@@ -73,6 +82,28 @@ const JournalPage = () => {
           Track your thoughts and progress
         </p>
       </motion.header>
+
+      {syncing && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '32px',
+          gap: '12px',
+          color: 'var(--text-secondary)',
+          fontSize: '14px',
+        }}>
+          <div style={{
+            width: '20px',
+            height: '20px',
+            border: '2px solid var(--border)',
+            borderTopColor: 'var(--primary)',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+          }} />
+          Syncing journal entries...
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
         {['write', 'analysis'].map(tab => (

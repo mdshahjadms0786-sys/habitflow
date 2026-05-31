@@ -1,3 +1,5 @@
+import logger from './logger'
+
 const STORAGE_KEY = 'ht_experiments';
 
 export const getExperimentProgress = (experiment) => {
@@ -110,7 +112,7 @@ export const saveExperiments = (experiments) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(experiments));
   } catch (e) {
-    console.error('Failed to save experiments', e);
+    logger.error('Failed to save experiments', e);
   }
 };
 
@@ -119,7 +121,7 @@ export const loadExperiments = () => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch (e) {
-    console.error('Failed to load experiments', e);
+    logger.error('Failed to load experiments', e);
     return [];
   }
 };

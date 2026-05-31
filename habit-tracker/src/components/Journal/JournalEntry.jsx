@@ -4,6 +4,7 @@ import { saveJournalEntry } from '../../utils/journalUtils';
 import { getTodayISO } from '../../utils/dateUtils';
 import toast from 'react-hot-toast';
 import { useAuthContext } from '../../context/AuthContext';
+import logger from '../../utils/logger';
 import { saveJournalEntry as saveToSupabase } from '../../services/supabaseService';
 
 const JournalEntry = ({ habitId, date, existingNote, onSave }) => {
@@ -30,7 +31,7 @@ const JournalEntry = ({ habitId, date, existingNote, onSave }) => {
         habitId,
         date: dateStr,
         text: note,
-      }, user.id).catch(e => console.error(e));
+      }, user.id).catch(e => logger.error('Failed to sync journal entry:', e));
     }
 
     if (onSave) onSave();

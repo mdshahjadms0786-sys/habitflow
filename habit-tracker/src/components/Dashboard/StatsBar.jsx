@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 
 const statCards = [
@@ -7,7 +8,7 @@ const statCards = [
   { key: 'total', label: 'Total Habits', format: (value) => value, icon: '📝' },
 ];
 
-export const StatsBar = ({ completedToday, totalToday, completionPercentage, bestStreak }) => {
+const StatsBar = memo(({ completedToday, totalToday, completionPercentage, bestStreak }) => {
   const stats = [
     { key: 'today', value: { completed: completedToday, total: totalToday } },
     { key: 'completion', value: completionPercentage },
@@ -78,6 +79,6 @@ export const StatsBar = ({ completedToday, totalToday, completionPercentage, bes
       })}
     </div>
   );
-};
+});
 
 export default StatsBar;

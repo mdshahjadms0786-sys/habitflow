@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import NewspaperCard from '../components/Newspaper/NewspaperCard';
+import logger from '../utils/logger';
 import { generateNewspaper } from '../utils/newspaperUtils';
 import { useHabits } from '../hooks/useHabits';
 import { useMoodContext } from '../context/MoodContext';
@@ -27,7 +28,7 @@ const NewspaperPage = () => {
         setPastNewspapers(JSON.parse(saved));
       }
     } catch (e) {
-      console.error('Failed to load past newspapers', e);
+      logger.error('Failed to load past newspapers', e);
     }
   }, [habits, moodLog]);
 
@@ -37,7 +38,7 @@ const NewspaperPage = () => {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated.slice(0, 7)));
       } catch (e) {
-        console.error('Failed to save newspaper', e);
+        logger.error('Failed to save newspaper', e);
       }
     }
   };

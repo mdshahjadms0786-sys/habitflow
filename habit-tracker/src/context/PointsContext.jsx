@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import logger from '../utils/logger';
 import * as pointsUtils from '../utils/pointsUtils';
 import toast from 'react-hot-toast';
 import { useAuthContext } from './AuthContext';
@@ -32,7 +33,7 @@ export const PointsProvider = ({ children }) => {
       setHistory(pointsUtils.getPointsHistory().slice(0, 50));
       setReferralStats(pointsUtils.getReferralStats());
     } catch (e) {
-      console.error('refreshPoints error:', e);
+      logger.error('refreshPoints error:', e);
     }
   }, []);
 
@@ -50,9 +51,12 @@ export const PointsProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       const fetchSupabase = async () => {
-        const profile = await getUserProfile(user.id);
+        const { data: profile, error } = await getUserProfile(user.id);
+        if (error) {
+          logger.error('Failed to fetch user profile for points sync:', error);
+          return;
+        }
         if (profile) {
-          // Sync supabase points to local if they differ
           if (profile.total_points > pointsUtils.loadPoints()) {
             localStorage.setItem('ht_points', profile.total_points);
             if (profile.points_history) {
@@ -73,6 +77,8 @@ export const PointsProvider = ({ children }) => {
         total_points: totalPoints,
         current_level: currentLevel.level,
         points_history: history
+      }).then(({ error }) => {
+        if (error) logger.error('Failed to sync points to Supabase:', error);
       });
     }
   }, [totalPoints, currentLevel, history, user]);

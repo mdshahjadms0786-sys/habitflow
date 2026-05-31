@@ -8,6 +8,7 @@ const DAILY_LOGIN_KEY = 'ht_last_login_bonus';
 const REFERRAL_KEY = 'ht_referrals';
 const STREAK_MILESTONES_KEY = 'ht_streak_milestones_claimed';
 const PERFECT_DAY_KEY = 'ht_perfect_day_claimed';
+import logger from './logger'
 const WEEKLY_BONUS_KEY = 'ht_weekly_bonus_claimed';
 
 // ============================================================
@@ -224,7 +225,7 @@ export const checkAndAwardStreakBonus = (streak, habitId) => {
       }
     }
   } catch (e) {
-    console.error('Streak bonus error:', e);
+    logger.error('Streak bonus error:', e);
   }
   return null;
 };

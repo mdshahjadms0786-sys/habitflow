@@ -51,24 +51,28 @@ const getOAuthRedirectTo = () => {
   return `${window.location.origin}/auth/callback`;
 };
 
-export const fetchHabits = async (userId) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+export const fetchHabits = async (userId, page = 1, limit = 50) => {
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
 
   try {
-    const { data, error } = await supabase
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    const { data, error, count } = await supabase
       .from('habits')
-      .select('*')
-      .eq('user_id', userId);
+      .select('*', { count: 'exact' })
+      .eq('user_id', userId)
+      .range(from, to);
 
     if (error) throw error;
-return data || [];
-  } catch {
-    return null;
+    return { data: data || [], count, hasMore: count > to + 1, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
 export const saveHabit = async (habit, userId) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
 
   try {
     const habitData = {
@@ -92,15 +96,15 @@ export const saveHabit = async (habit, userId) => {
       .upsert(habitData, { onConflict: 'id' })
       .select();
 
-if (error) throw error;
-    return data || habit;
-  } catch {
-    return null;
+    if (error) throw error;
+    return { data: data || habit, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
 export const deleteHabit = async (habitId) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
 
   try {
     const { error } = await supabase
@@ -109,14 +113,14 @@ export const deleteHabit = async (habitId) => {
       .eq('id', habitId);
 
     if (error) throw error;
-    return true;
-  } catch {
-    return false;
+    return { data: true, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
 export const updateHabitCompletion = async (habitId, completionLog) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
 
   try {
     const { data, error } = await supabase
@@ -129,14 +133,14 @@ export const updateHabitCompletion = async (habitId, completionLog) => {
       .select();
 
     if (error) throw error;
-    return data;
-  } catch {
-    return null;
+    return { data, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
 export const fetchMoodLog = async (userId) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
 
   try {
     const { data, error } = await supabase
@@ -150,14 +154,14 @@ export const fetchMoodLog = async (userId) => {
     (data || []).forEach(entry => {
       moodLog[entry.date] = entry.mood_id;
     });
-    return moodLog;
-  } catch {
-    return null;
+    return { data: moodLog, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
 export const saveMoodEntry = async (date, moodId, userId) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
 
   try {
     const { data, error } = await supabase
@@ -170,9 +174,9 @@ export const saveMoodEntry = async (date, moodId, userId) => {
       .select();
 
     if (error) throw error;
-    return data;
-  } catch {
-    return null;
+    return { data, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
@@ -217,7 +221,7 @@ export const signOut = async () => {
 };
 
 export const getCurrentUser = async () => {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
 
   try {
     if (typeof window !== 'undefined') {
@@ -231,9 +235,9 @@ export const getCurrentUser = async () => {
     }
 
     const { data: { user } } = await supabase.auth.getUser();
-    return user;
-  } catch (err) {
-    return null;
+    return { data: user, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
@@ -289,7 +293,7 @@ export const loginWithGoogleIdToken = async (credential) => {
 };
 
 export const getUserProfile = async (userId) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
 
   try {
     const { data, error } = await supabase
@@ -299,14 +303,14 @@ export const getUserProfile = async (userId) => {
       .single();
 
     if (error && error.code !== 'PGRST116') throw error;
-    return data;
-  } catch {
-    return null;
+    return { data, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
 export const updateUserProfile = async (userId, profileData) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
 
   try {
     const { data, error } = await supabase
@@ -319,27 +323,32 @@ export const updateUserProfile = async (userId, profileData) => {
       .select();
 
     if (error) throw error;
-    return data;
-  } catch {
-    return null;
+    return { data, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
-// --- NEW SYNC FUNCTIONS ---
-
-export const fetchFocusSessions = async (userId) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+export const fetchFocusSessions = async (userId, page = 1, limit = 50) => {
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
   try {
-    const { data, error } = await supabase.from('focus_sessions').select('*').eq('user_id', userId);
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    const { data, error, count } = await supabase.from('focus_sessions')
+      .select('*', { count: 'exact' })
+      .eq('user_id', userId)
+      .range(from, to);
+
     if (error) throw error;
-    return data;
-  } catch {
-    return null;
+    return { data: data || [], count, hasMore: count > to + 1, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
 export const saveFocusSession = async (session, userId) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
   try {
     const { data, error } = await supabase.from('focus_sessions').insert({
       id: session.id,
@@ -349,25 +358,32 @@ export const saveFocusSession = async (session, userId) => {
       date: session.date
     }).select();
     if (error) throw error;
-    return data;
-  } catch {
-    return null;
+    return { data, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
-export const fetchJournalEntries = async (userId) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+export const fetchJournalEntries = async (userId, page = 1, limit = 50) => {
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
   try {
-    const { data, error } = await supabase.from('journal_entries').select('*').eq('user_id', userId);
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    const { data, error, count } = await supabase.from('journal_entries')
+      .select('*', { count: 'exact' })
+      .eq('user_id', userId)
+      .range(from, to);
+
     if (error) throw error;
-    return data;
-  } catch {
-    return null;
+    return { data: data || [], count, hasMore: count > to + 1, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
 export const saveJournalEntry = async (entry, userId) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
   try {
     const { data, error } = await supabase.from('journal_entries').upsert({
       id: entry.id,
@@ -378,14 +394,14 @@ export const saveJournalEntry = async (entry, userId) => {
       sentiment_score: entry.sentiment || null,
     }, { onConflict: 'id' }).select();
     if (error) throw error;
-    return data;
-  } catch {
-    return null;
+    return { data, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
 export const fetchEliteFeatureData = async (featureKey, userId) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
   try {
     const { data, error } = await supabase.from('elite_features_data')
       .select('data_json')
@@ -393,14 +409,14 @@ export const fetchEliteFeatureData = async (featureKey, userId) => {
       .eq('feature_key', featureKey)
       .single();
     if (error && error.code !== 'PGRST116') throw error;
-    return data ? data.data_json : null;
-  } catch {
-    return null;
+    return { data: data ? data.data_json : null, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
   }
 };
 
 export const saveEliteFeatureData = async (featureKey, dataJson, userId) => {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
   try {
     const { data, error } = await supabase.from('elite_features_data').upsert({
       user_id: userId,
@@ -409,9 +425,42 @@ export const saveEliteFeatureData = async (featureKey, dataJson, userId) => {
       updated_at: new Date().toISOString()
     }, { onConflict: 'user_id,feature_key' }).select();
     if (error) throw error;
-    return data;
-  } catch {
-    return null;
+    return { data, error: null };
+  } catch (e) {
+    return { data: null, error: e.message };
+  }
+};
+
+export const resetPassword = async (email) => {
+  if (!isSupabaseConfigured || !supabase) {
+    return { error: { message: 'Supabase not configured' } };
+  }
+
+  try {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) throw error;
+    return { data, error: null };
+  } catch (err) {
+    return { error: { message: getAuthErrorMessage(err) } };
+  }
+};
+
+export const resendVerificationEmail = async (email) => {
+  if (!isSupabaseConfigured || !supabase) {
+    return { error: { message: 'Supabase not configured' } };
+  }
+
+  try {
+    const { data, error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+    });
+    if (error) throw error;
+    return { data, error: null };
+  } catch (err) {
+    return { error: { message: getAuthErrorMessage(err) } };
   }
 };
 

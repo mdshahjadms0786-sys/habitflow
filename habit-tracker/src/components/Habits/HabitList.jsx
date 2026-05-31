@@ -1,6 +1,7 @@
+import { memo } from 'react';
 import HabitCard from './HabitCard';
 
-export const HabitList = ({ habits, onToggle, onEdit, onDelete }) => {
+const HabitList = memo(({ habits, onToggle, onEdit, onDelete }) => {
   if (!habits || habits.length === 0) {
     return (
       <EmptyState
@@ -77,6 +78,6 @@ export const HabitList = ({ habits, onToggle, onEdit, onDelete }) => {
       )}
     </div>
   );
-};
+});
 
 export default HabitList;

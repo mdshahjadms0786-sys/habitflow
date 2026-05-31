@@ -1,3 +1,5 @@
+import logger from './logger'
+
 const STORAGE_KEY = 'ht_schedule';
 
 const DAY_NAMES = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -134,7 +136,7 @@ export const saveSchedule = (schedule) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(schedule));
   } catch (e) {
-    console.error('Failed to save schedule', e);
+    logger.error('Failed to save schedule', e);
   }
 };
 
@@ -143,7 +145,7 @@ export const loadSchedule = () => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : {};
   } catch (e) {
-    console.error('Failed to load schedule', e);
+    logger.error('Failed to load schedule', e);
     return {};
   }
 };
