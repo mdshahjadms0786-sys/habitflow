@@ -415,20 +415,9 @@ export const saveEliteFeatureData = async (featureKey, dataJson, userId) => {
   }
 };
 
-export const recordPayment = async ({ userId, paymentId, amount, plan }) => {
-  if (!isSupabaseConfigured || !supabase) return null;
-  try {
-    const { data, error } = await supabase.from('payments').insert({
-      user_id: userId,
-      payment_id: paymentId,
-      amount: amount,
-      plan: plan,
-      status: 'completed',
-      created_at: new Date().toISOString()
-    }).select();
-    if (error) throw error;
-    return data;
-  } catch {
-    return null;
-  }
-};
+// recordPayment is removed for security.
+// Payments must go through the verify-payment Edge Function which:
+// 1. Verifies Razorpay signature server-side
+// 2. Inserts payment record using service_role key (bypasses RLS)
+// 3. Updates user plan using service_role key
+// See: supabase/functions/verify-payment/index.ts

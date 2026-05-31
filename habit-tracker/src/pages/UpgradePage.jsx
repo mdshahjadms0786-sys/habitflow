@@ -5,7 +5,7 @@ import { getPlanComparisonData, PLANS } from '../utils/planUtils';
 import toast from 'react-hot-toast';
 import { useRazorpay } from '../hooks/useRazorpay';
 import { useAuthContext } from '../context/AuthContext';
-import { recordPayment } from '../services/supabaseService';
+// Payment verification now handled server-side by verify-payment Edge Function
 
 const FAQS = [
   { q: 'Can I cancel anytime?', a: 'Yes! You can cancel your subscription anytime. No questions asked.' },
@@ -54,15 +54,7 @@ const UpgradePage = () => {
       name: 'HabitFlow',
       description: `Upgrade to ${planName}`,
       prefill: { email: user?.email || '', contact: '' },
-      onSuccess: async (response) => {
-        // Record payment in Supabase
-        await recordPayment({
-          userId: user.id,
-          paymentId: response.razorpay_payment_id,
-          amount: amount,
-          plan: planId
-        });
-
+      onSuccess: async () => {
         toast.success(`Welcome to ${PLANS[planId].name}! 🎉 Payment Successful.`);
         upgrade(planId);
         navigate('/');

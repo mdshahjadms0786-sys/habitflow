@@ -112,7 +112,12 @@ ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for new tables
 DROP POLICY IF EXISTS "Users own profiles" ON user_profiles;
-CREATE POLICY "Users own profiles" ON user_profiles FOR ALL USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+-- In production: restrict UPDATE to only non-plan fields by using Edge Functions for plan changes.
+-- Edge Functions use service_role key which bypasses RLS entirely.
+CREATE POLICY "Users own profiles" ON user_profiles
+  FOR ALL
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
 
 DROP POLICY IF EXISTS "Users own focus_sessions" ON focus_sessions;
 CREATE POLICY "Users own focus_sessions" ON focus_sessions FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
@@ -126,10 +131,9 @@ CREATE POLICY "Users own elite_features_data" ON elite_features_data FOR ALL USI
 DROP POLICY IF EXISTS "Users read own payments" ON payments;
 CREATE POLICY "Users read own payments" ON payments FOR SELECT USING (auth.uid() = user_id);
 
+-- Payments can only be inserted by the Edge Function (uses service_role key, bypasses RLS)
+-- This prevents users from inserting fake payment records from the browser.
 DROP POLICY IF EXISTS "Users insert own payment records" ON payments;
-CREATE POLICY "Users insert own payment records" ON payments
-  FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
 
 CREATE INDEX IF NOT EXISTS idx_user_profiles_plan ON user_profiles(plan);
 CREATE INDEX IF NOT EXISTS idx_focus_sessions_user_id ON focus_sessions(user_id);
