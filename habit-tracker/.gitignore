@@ -76,3 +76,4 @@ scripts/generate-icons.js
 *.key
 *.cert
 secrets.json
+.vercel
