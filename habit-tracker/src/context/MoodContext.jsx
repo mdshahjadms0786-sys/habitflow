@@ -95,7 +95,8 @@ export const MoodProvider = ({ children }) => {
         supabase.from('mood_logs').upsert(mappedLogs, { onConflict: 'user_id,date' })
           .then(({ error }) => { 
             if (error) logger.error('Supabase Mood Sync Error:', error); 
-          });
+          })
+          .catch(e => logger.error('Sync failed:', e));
       }
     }
   }, [state.moodLog, user]);

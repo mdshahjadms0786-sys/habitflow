@@ -305,9 +305,16 @@ export const HabitProvider = ({ children }) => {
     dispatch({ type: 'EDIT_HABIT', payload: habit });
   }, []);
 
-  const deleteHabit = useCallback((id) => {
-    dispatch({ type: 'DELETE_HABIT', payload: id });
-  }, []);
+  const deleteHabit = useCallback(async (id) => {
+    if (user) {
+      const { error } = await supabase
+        .from('habits')
+        .delete()
+        .eq('id', id)
+      if (error) logger.error('Failed to delete habit:', error)
+    }
+    dispatch({ type: 'DELETE_HABIT', payload: id })
+  }, [user])
 
   const toggleHabit = useCallback((habitId, date, isUndo = false) => {
     dispatch({ type: 'TOGGLE_HABIT', payload: { habitId, date, isUndo } });

@@ -17,6 +17,7 @@ import TimerWidget from './components/Timer/TimerWidget';
 import SyncStatus from './components/Auth/SyncStatus';
 import HelpButton from './components/UI/HelpButton';
 import { usePWA } from './hooks/usePWA';
+import { isSupabaseConfigured } from './services/supabaseClient';
 // Lazy-loaded pages grouped by feature
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const AllHabits = lazy(() => import('./pages/AllHabits'));
@@ -329,9 +330,22 @@ function AppWithRouter() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppWithRouter />
-    </BrowserRouter>
+    <>
+      {!isSupabaseConfigured && (
+        <div style={{
+          background: '#ef4444',
+          color: 'white',
+          padding: '12px',
+          textAlign: 'center',
+          fontSize: '14px'
+        }}>
+          Server connection issue. Please contact support.
+        </div>
+      )}
+      <BrowserRouter>
+        <AppWithRouter />
+      </BrowserRouter>
+    </>
   );
 }
 

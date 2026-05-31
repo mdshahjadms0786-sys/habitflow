@@ -79,7 +79,7 @@ export const PointsProvider = ({ children }) => {
         points_history: history
       }).then(({ error }) => {
         if (error) logger.error('Failed to sync points to Supabase:', error);
-      });
+      }).catch(e => logger.error('Sync failed:', e));
     }
   }, [totalPoints, currentLevel, history, user]);
 

@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import logger from '../utils/logger';
 import { useAuthContext } from './AuthContext';
 import { getUserProfile, updateUserProfile } from '../services/supabaseService';
+import { supabase } from '../services/supabaseClient';
 import {
   getCurrentPlan,
   setPlan,
@@ -79,6 +80,22 @@ export const PlanProvider = ({ children }) => {
     };
     fetchProfile();
   }, [user]);
+
+  useEffect(() => {
+    const fetchPlanFromServer = async () => {
+      if (!user) return
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('plan')
+        .eq('id', user.id)
+        .single()
+      if (!error && data?.plan) {
+        setCurrentPlan(data.plan)
+        localStorage.setItem('ht_plan', data.plan)
+      }
+    }
+    fetchPlanFromServer()
+  }, [user])
 
   useEffect(() => {
     const handlePlanChange = (event) => {

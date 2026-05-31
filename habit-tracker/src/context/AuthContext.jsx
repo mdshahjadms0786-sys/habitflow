@@ -8,6 +8,7 @@ import {
   resetPassword as supabaseResetPassword,
   resendVerificationEmail as supabaseResendVerification,
 } from '../services/supabaseService';
+import { supabase } from '../services/supabaseClient';
 import toast from 'react-hot-toast';
 import logger from '../utils/logger';
 
@@ -75,6 +76,16 @@ export function AuthProvider({ children }) {
       setAuthError(error.message);
       toast.error(error.message);
     } else {
+      if (data?.user) {
+        await supabase
+          .from('user_profiles')
+          .insert({
+            id: data.user.id,
+            plan: 'free',
+            total_points: 0,
+            current_level: 1
+          });
+      }
       toast.success('Sign up successful! Please check your email to verify.');
     }
     setIsLoading(false);

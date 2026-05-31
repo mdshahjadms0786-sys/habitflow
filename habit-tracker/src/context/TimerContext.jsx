@@ -283,7 +283,7 @@ export const TimerProvider = ({ children }) => {
         date: sessionData.date
       }, user.id).then(({ error }) => {
         if (error) logger.error('Failed to sync focus session:', error);
-      });
+      }).catch(e => logger.error('Sync failed:', e));
     }
   }, [state.activeHabitId, state.activeHabitName, state.activeHabitIcon, user]);
 
