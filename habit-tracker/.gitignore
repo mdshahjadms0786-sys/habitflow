@@ -15,6 +15,7 @@ node_modules
 dist
 dist-ssr
 *.local
+build_output.txt
 
 # Environment files — IMPORTANT: never push these
 .env
