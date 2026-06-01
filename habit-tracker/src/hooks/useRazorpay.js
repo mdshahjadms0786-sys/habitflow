@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { callEdgeFunction } from '../services/edgeFunctions'
+import toast from 'react-hot-toast'
 
 const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID
 
@@ -33,9 +34,8 @@ export const useRazorpay = () => {
     onSuccess,
     onError,
   }) => {
-    if (!RAZORPAY_KEY_ID) {
-      const error = new Error('Razorpay is not configured. Set VITE_RAZORPAY_KEY_ID for production.')
-      if (onError) onError(error)
+    if (!import.meta.env.VITE_RAZORPAY_KEY_ID) {
+      toast.error('Payment integration coming soon!')
       return
     }
 

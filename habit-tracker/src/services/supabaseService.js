@@ -254,9 +254,6 @@ export const loginWithGoogle = async () => {
     return { error: { message: 'Supabase not configured' } };
   }
 
-  const reachability = await verifySupabaseReachable();
-  if (reachability.error) return reachability;
-
   try {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',

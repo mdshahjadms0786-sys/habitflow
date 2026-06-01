@@ -9,13 +9,41 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
+        // Check if session already exists
+        // (AuthProvider may have already exchanged the code)
+        const { data: { session } } = await supabase.auth.getSession()
+
+        if (session) {
+          // Session already exists — no need to exchange again
+          // Check if user_profiles exists
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('id')
+            .eq('id', session.user.id)
+            .single()
+
+          if (!profile) {
+            await supabase
+              .from('user_profiles')
+              .insert({
+                id: session.user.id,
+                plan: 'free',
+                total_points: 0,
+                current_level: 1
+              })
+          }
+          navigate('/')
+          return
+        }
+
+        // Session does not exist — try exchanging code
         const { data, error } = await supabase.auth.exchangeCodeForSession(
           window.location.href
         )
 
         if (error) {
           logger.error('Auth callback error:', error)
-          navigate('/login?error=auth_failed')
+          navigate('/')
           return
         }
 
@@ -40,8 +68,8 @@ const AuthCallback = () => {
 
         navigate('/')
       } catch (err) {
-        logger.error('Unexpected auth callback error:', err)
-        navigate('/login?error=unexpected')
+        logger.error('Auth callback unexpected error:', err)
+        navigate('/')
       }
     }
 

@@ -354,7 +354,9 @@ const ChatInterface = ({ habits, moodLog }) => {
         const parsed = JSON.parse(saved);
         return parsed.slice(-50);
       }
-    } catch {}
+    } catch (e) {
+      // Ignore JSON parse errors
+    }
     return [{ role: 'assistant', content: "Hi! I'm your HabitFlow Coach 🤖 How can I help you with your habits today?", timestamp: new Date() }];
   });
   const [input, setInput] = useState('');
@@ -365,7 +367,9 @@ const ChatInterface = ({ habits, moodLog }) => {
     try {
       const toSave = messages.slice(-50);
       localStorage.setItem('ht_ai_chat_messages', JSON.stringify(toSave));
-    } catch {}
+    } catch (e) {
+      // Ignore local storage write errors
+    }
   }, [messages]);
 
   useEffect(() => {

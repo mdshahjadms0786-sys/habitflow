@@ -162,7 +162,9 @@ function AppContent() {
       try {
         const { SplashScreen } = await import('@capacitor/splash-screen')
         await SplashScreen.hide()
-      } catch {}
+      } catch (e) {
+        // Ignore splash screen imports on web/non-capacitor
+      }
       try {
         const { App } = await import('@capacitor/app')
         await App.addListener('backButton', ({ canGoBack }) => {
@@ -175,7 +177,9 @@ function AppContent() {
             }
           }
         })
-      } catch {}
+      } catch (e) {
+        // Ignore App imports on web/non-capacitor
+      }
     }
     initCapacitor()
   }, [navigate])

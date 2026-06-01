@@ -13,8 +13,10 @@ const WeeklyInsightCard = ({ habits, moodLog }) => {
   const habitsRef = useRef(habits);
   const moodLogRef = useRef(moodLog);
 
-  habitsRef.current = habits;
-  moodLogRef.current = moodLog;
+  useEffect(() => {
+    habitsRef.current = habits;
+    moodLogRef.current = moodLog;
+  }, [habits, moodLog]);
 
   useEffect(() => {
     if (fetchedRef.current) return;
@@ -33,7 +35,9 @@ const WeeklyInsightCard = ({ habits, moodLog }) => {
           setIsLoading(false);
           return;
         }
-      } catch {}
+      } catch (e) {
+        // Ignore JSON parsing errors
+      }
     }
 
     const doFetch = async () => {
