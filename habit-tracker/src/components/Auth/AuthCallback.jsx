@@ -9,13 +9,14 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Check if session already exists
-        // (AuthProvider may have already exchanged the code)
+        // Give Supabase's detectSessionInUrl a moment to auto-exchange the code
+        await new Promise(resolve => setTimeout(resolve, 500))
+
+        // Check if session was already established by auto-detection
         const { data: { session } } = await supabase.auth.getSession()
 
         if (session) {
-          // Session already exists — no need to exchange again
-          // Check if user_profiles exists
+          // Session exists — ensure user_profiles row exists
           const { data: profile } = await supabase
             .from('user_profiles')
             .select('id')
@@ -36,33 +37,36 @@ const AuthCallback = () => {
           return
         }
 
-        // Session does not exist — try exchanging code
-        const { data, error } = await supabase.auth.exchangeCodeForSession(
-          window.location.href
-        )
+        // No session found — try manual code exchange as fallback
+        const urlParams = new URLSearchParams(window.location.search)
+        if (urlParams.has('code')) {
+          const { data, error } = await supabase.auth.exchangeCodeForSession(
+            window.location.href
+          )
 
-        if (error) {
-          logger.error('Auth callback error:', error)
-          navigate('/')
-          return
-        }
+          if (error) {
+            logger.error('Auth callback exchange error:', error)
+            navigate('/')
+            return
+          }
 
-        if (data?.user) {
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('id')
-            .eq('id', data.user.id)
-            .single()
-
-          if (!profile) {
-            await supabase
+          if (data?.user) {
+            const { data: profile } = await supabase
               .from('user_profiles')
-              .insert({
-                id: data.user.id,
-                plan: 'free',
-                total_points: 0,
-                current_level: 1
-              })
+              .select('id')
+              .eq('id', data.user.id)
+              .single()
+
+            if (!profile) {
+              await supabase
+                .from('user_profiles')
+                .insert({
+                  id: data.user.id,
+                  plan: 'free',
+                  total_points: 0,
+                  current_level: 1
+                })
+            }
           }
         }
 

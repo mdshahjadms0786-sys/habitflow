@@ -224,16 +224,9 @@ export const getCurrentUser = async () => {
   if (!isSupabaseConfigured || !supabase) return { data: null, error: 'Supabase not configured' };
 
   try {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const hasOAuthCode = params.has('code');
-
-      if (hasOAuthCode) {
-        await supabase.auth.exchangeCodeForSession(window.location.href);
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    }
-
+    // Do NOT manually call exchangeCodeForSession here.
+    // supabaseClient has detectSessionInUrl: true, which automatically
+    // exchanges the OAuth code. Calling it again causes PKCE "code already used" errors.
     const { data: { user } } = await supabase.auth.getUser();
     return { data: user, error: null };
   } catch (e) {

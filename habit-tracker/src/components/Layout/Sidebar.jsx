@@ -331,7 +331,7 @@ const Sidebar = memo(() => {
               </motion.div>
             )}
           </NavLink>
-        ))}`
+        ))}
         
         {/* LOGOUT BUTTON */}
         <motion.div
