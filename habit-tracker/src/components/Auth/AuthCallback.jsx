@@ -33,7 +33,7 @@ const AuthCallback = () => {
                 current_level: 1
               })
           }
-          navigate('/')
+          window.location.replace('/')
           return
         }
 
@@ -46,7 +46,7 @@ const AuthCallback = () => {
 
           if (error) {
             logger.error('Auth callback exchange error:', error)
-            navigate('/')
+            window.location.replace('/')
             return
           }
 
@@ -70,10 +70,10 @@ const AuthCallback = () => {
           }
         }
 
-        navigate('/')
+        window.location.replace('/')
       } catch (err) {
         logger.error('Auth callback unexpected error:', err)
-        navigate('/')
+        window.location.replace('/')
       }
     }
 
