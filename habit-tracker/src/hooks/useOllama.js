@@ -7,8 +7,14 @@ export const useOllama = (_model) => {
   const [connected, setConnected] = useState(true);
 
   const checkConnection = useCallback(async () => {
-    setConnected(true);
-    return true;
+    try {
+      const result = await checkOllamaConnection();
+      setConnected(!!result);
+      return !!result;
+    } catch {
+      setConnected(false);
+      return false;
+    }
   }, []);
 
   const fetchSuggestions = useCallback(async (userGoal) => {

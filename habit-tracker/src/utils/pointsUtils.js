@@ -6,9 +6,9 @@ const POINTS_KEY = 'ht_points';
 const POINTS_HISTORY_KEY = 'ht_points_history';
 const DAILY_LOGIN_KEY = 'ht_last_login_bonus';
 const REFERRAL_KEY = 'ht_referrals';
+import logger from './logger'
 const STREAK_MILESTONES_KEY = 'ht_streak_milestones_claimed';
 const PERFECT_DAY_KEY = 'ht_perfect_day_claimed';
-import logger from './logger'
 const WEEKLY_BONUS_KEY = 'ht_weekly_bonus_claimed';
 
 // ============================================================
@@ -136,7 +136,7 @@ export const getPointsHistory = () => {
   }
 };
 
-export const logPointsHistory = (reason, finalPoints, basePoints, multiplier) => {
+export const logPointsHistory = (reason, finalPoints, basePoints, multiplier, habitId) => {
   try {
     const history = getPointsHistory();
     history.unshift({
@@ -146,6 +146,7 @@ export const logPointsHistory = (reason, finalPoints, basePoints, multiplier) =>
       multiplier,
       timestamp: Date.now(),
       date: new Date().toISOString().split('T')[0],
+      ...(habitId ? { habitId } : {}),
     });
     localStorage.setItem(POINTS_HISTORY_KEY, JSON.stringify(history.slice(0, 200)));
   } catch {
@@ -154,7 +155,7 @@ export const logPointsHistory = (reason, finalPoints, basePoints, multiplier) =>
 };
 
 export const addPoints = (reason, options = {}) => {
-  const { silent: _silent = false, customAmount = null, plan = null } = options;
+  const { silent: _silent = false, customAmount = null, plan = null, habitId = null } = options;
 
   let basePoints = 0;
   if (customAmount !== null) {
@@ -174,7 +175,7 @@ export const addPoints = (reason, options = {}) => {
   const current = loadPoints();
   const updated = current + finalPoints;
   savePoints(updated);
-  logPointsHistory(reason, finalPoints, basePoints, multiplier);
+  logPointsHistory(reason, finalPoints, basePoints, multiplier, habitId);
 
   return finalPoints;
 };
@@ -335,11 +336,12 @@ export const getLevel = () => {
   return getCurrentLevel();
 };
 
-export const getPointsForHabit = (_habitId) => {
+export const getPointsForHabit = (habitId) => {
   const history = getPointsHistory();
-  const habitPoints = history.filter(h => 
-    h.reason === 'habitCompleted' || 
-    h.reason === 'allHabitsCompleted'
-  );
+  const habitPoints = history.filter(h => {
+    const isCompletion = h.reason === 'habitCompleted' || h.reason === 'allHabitsCompleted';
+    if (h.habitId) return isCompletion && h.habitId === habitId;
+    return isCompletion;
+  });
   return habitPoints.reduce((sum, h) => sum + h.points, 0);
 };

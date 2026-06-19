@@ -82,7 +82,7 @@ export const MoodProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (Object.keys(state.moodLog).length > 0 || state.moodLog !== loadMoodLog()) {
+    if (Object.keys(state.moodLog).length > 0 || JSON.stringify(state.moodLog) !== JSON.stringify(loadMoodLog())) {
       saveMoodLog(state.moodLog);
       
       if (user && supabase && Object.keys(state.moodLog).length > 0) {

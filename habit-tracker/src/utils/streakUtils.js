@@ -67,7 +67,11 @@ export const calculateLongestStreak = (completionLog) => {
 export const isCompletedToday = (completionLog) => {
   if (!completionLog) return false;
   const today = format(new Date(), 'yyyy-MM-dd');
-  return !!completionLog[today];
+  const entry = completionLog[today];
+  if (!entry) return false;
+  if (entry === true) return true;
+  if (typeof entry === 'object' && entry?.completed === true) return true;
+  return !!entry;
 };
 
 export const getWeekCompletions = (completionLog) => {

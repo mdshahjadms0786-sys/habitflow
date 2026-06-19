@@ -33,7 +33,7 @@ export const saveHabits = (habits) => {
     return true;
   } catch (error) {
     logger.error('Failed to save habits:', error);
-
+    return false;
   }
 };
 
@@ -101,6 +101,10 @@ export const clearAllData = () => {
     localStorage.removeItem(SETTINGS_KEY);
     localStorage.removeItem(MOOD_KEY);
     localStorage.removeItem(TIMER_SESSIONS_KEY);
+    localStorage.removeItem(FOCUS_SESSIONS_KEY);
+    localStorage.removeItem('ht_points');
+    localStorage.removeItem('ht_points_history');
+    localStorage.removeItem('ht_focus_sessions');
     return true;
   } catch (error) {
     logger.error('Failed to clear data:', error);

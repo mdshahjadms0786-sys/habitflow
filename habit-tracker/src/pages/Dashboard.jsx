@@ -126,8 +126,6 @@ const Dashboard = () => {
     setEmergencyActive(isEmergencyModeActive() || expired);
   }, []);
 
-  const { toggleHabit: contextToggleHabit } = useHabitContext();
-
   useEffect(() => {
     const checkAndExpireHabits = () => {
       const today = getTodayISO();

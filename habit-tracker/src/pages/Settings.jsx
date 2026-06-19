@@ -200,7 +200,8 @@ const Settings = () => {
                   backgroundColor: '#ffffff',
                   position: 'absolute',
                   top: '2px',
-                  transition: 'transform 0.2s',
+                  left: darkMode ? '26px' : '2px',
+                  transition: 'left 0.2s',
                 }}
               />
             </button>

@@ -96,7 +96,7 @@ const habitReducer = (state, action) => {
             newCompletionLog[targetDate] = { completed: true, completedAt: timeStr, locked: false };
             
             const { total, basePoints } = calculatePointsForCompletion(habit);
-            addPoints(total);
+            addPoints(total, { habitId: habit.id });
             
             const difficulty = getDifficultyLevel(habit.difficulty || 'medium');
             const toastEmojis = { easy: '✅', medium: '⭐', hard: '🔥', extreme: '💀' };

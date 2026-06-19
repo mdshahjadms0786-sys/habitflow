@@ -55,27 +55,44 @@ export const PlanProvider = ({ children }) => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeFeature, setUpgradeFeature] = useState(null);
   const [trialDaysRemaining, setTrialDaysRemaining] = useState(getTrialDaysRemaining());
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
 
-  // Sync plan from Supabase when user logs in
+  // Sync plan and onboarding status from Supabase when user logs in
   useEffect(() => {
     const fetchProfile = async () => {
       if (user) {
-        const { data: profile, error } = await getUserProfile(user.id);
-        if (error) {
-          logger.error('Failed to fetch user profile:', error);
-        }
-        if (profile) {
-          if (profile.plan) {
-            setCurrentPlan(profile.plan);
-            setPlan(profile.plan);
+        setIsProfileLoading(true);
+        try {
+          const { data: profile, error } = await getUserProfile(user.id);
+          if (error) {
+            logger.error('Failed to fetch user profile:', error);
           }
-          if (profile.onboarding_complete) {
-            localStorage.setItem('ht_onboarding_complete', 'true');
+          if (profile) {
+            if (profile.plan) {
+              setCurrentPlan(profile.plan);
+              setPlan(profile.plan);
+            }
+            // Sync onboarding status between local storage and database
+            const localOnboardingComplete = localStorage.getItem('ht_onboarding_complete') === 'true';
+            if (profile.onboarding_complete || localOnboardingComplete) {
+              localStorage.setItem('ht_onboarding_complete', 'true');
+              if (!profile.onboarding_complete) {
+                await updateUserProfile(user.id, { onboarding_complete: true });
+              }
+            } else {
+              localStorage.removeItem('ht_onboarding_complete');
+            }
+          } else if (!error && user) {
+            const { error: createError } = await updateUserProfile(user.id, { plan: currentPlan });
+            if (createError) logger.error('Failed to create user profile:', createError);
           }
-        } else if (!error && user) {
-          const { error: createError } = await updateUserProfile(user.id, { plan: currentPlan });
-          if (createError) logger.error('Failed to create user profile:', createError);
+        } catch (err) {
+          logger.error('Error in fetchProfile:', err);
+        } finally {
+          setIsProfileLoading(false);
         }
+      } else {
+        setIsProfileLoading(false);
       }
     };
     fetchProfile();
@@ -185,6 +202,7 @@ export const PlanProvider = ({ children }) => {
     gradient: getPlanGradient(),
     name: getPlanName(),
     tagline: getPlanTagline(),
+    isProfileLoading,
 
     hasFeature,
     canUseFeature,

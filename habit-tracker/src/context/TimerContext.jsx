@@ -131,8 +131,6 @@ const timerReducer = (state, action) => {
     case 'ADD_FOCUS_SESSION': {
       const sessions = state.focusSessions || [];
       const newSessions = [...sessions, action.payload];
-      const today = getTodayISO();
-      const todaySessions = newSessions.filter(s => s.date === today);
       return { ...state, focusSessions: newSessions };
     }
 
@@ -318,7 +316,7 @@ export const TimerProvider = ({ children }) => {
     const today = getTodayISO();
     const sessions = state.focusSessions || [];
     const todaySessions = sessions.filter(s => s.date === today);
-    const totalMinutes = todaySessions.reduce((acc, s) => acc + Math.floor(s.duration / 60), 0);
+    const totalMinutes = todaySessions.reduce((acc, s) => acc + (s.duration || 0), 0);
     const totalPoints = todaySessions.reduce((acc, s) => acc + (s.points || 0), 0);
     
     let focusStreak = 0;

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import { Toaster } from 'react-hot-toast';
 import { useHabitContext } from './context/HabitContext';
 import { useAuthContext } from './context/AuthContext';
+import { usePlanContext } from './context/PlanContext';
 import AuthGuard from './components/Auth/AuthGuard';
 import AuthCallback from './components/Auth/AuthCallback';
 import PlanGuard from './components/Auth/PlanGuard';
@@ -96,6 +97,8 @@ function AppContent() {
   const { darkMode } = useHabitContext();
   const navigate = useNavigate();
   const [isTyping, setIsTyping] = useState(false);
+  const { user, isLoading: authLoading } = useAuthContext();
+  const { isProfileLoading } = usePlanContext();
   const {
     isInstallable,
     isOffline,
@@ -106,20 +109,34 @@ function AppContent() {
   } = usePWA();
 
   useEffect(() => {
+    if (authLoading || isProfileLoading) return;
+
     const completed = localStorage.getItem('ht_onboarding_complete');
     const selectedPlan = localStorage.getItem('ht_selected_plan');
     const currentPath = window.location.pathname;
 
     if (currentPath === '/auth/callback') return;
 
-    if (!completed) {
-      if (!selectedPlan && currentPath !== '/landing') {
-        navigate('/landing', { replace: true });
-      } else if (selectedPlan && currentPath !== '/onboarding' && currentPath !== '/landing') {
-        navigate('/onboarding', { replace: true });
+    if (user) {
+      if (!completed) {
+        if (currentPath !== '/onboarding') {
+          navigate('/onboarding', { replace: true });
+        }
+      } else {
+        if (currentPath === '/landing' || currentPath === '/onboarding') {
+          navigate('/', { replace: true });
+        }
+      }
+    } else {
+      if (!completed) {
+        if (!selectedPlan && currentPath !== '/landing') {
+          navigate('/landing', { replace: true });
+        } else if (selectedPlan && currentPath !== '/onboarding' && currentPath !== '/landing') {
+          navigate('/onboarding', { replace: true });
+        }
       }
     }
-  }, [navigate]);
+  }, [user, authLoading, isProfileLoading, navigate]);
 
   const currentPath = window.location.pathname;
   const hideNavigation = currentPath === '/landing' || currentPath === '/onboarding' || currentPath === '/auth/callback';
