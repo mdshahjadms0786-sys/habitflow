@@ -4,7 +4,7 @@ import { calculateCurrentStreak, calculateLongestStreak } from '../utils/streakU
 import { getTodayISO } from '../utils/dateUtils';
 import { format } from 'date-fns';
 import { checkNewBadge } from '../utils/badgeUtils';
-import { addPoints, checkAndAwardStreakBonus, checkAndAwardPerfectDay } from '../utils/pointsUtils';
+import { addPoints, checkAndAwardStreakBonus } from '../utils/pointsUtils';
 import { calculatePointsForCompletion, getDifficultyLevel } from '../utils/difficultyUtils';
 import { getMaxHabits, isPro } from '../utils/planUtils';
 import toast from 'react-hot-toast';

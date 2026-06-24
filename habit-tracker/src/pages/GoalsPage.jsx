@@ -25,6 +25,17 @@ const GoalsPage = () => {
   const [goals, setGoals] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState(null);
+  const [newGoal, setNewGoal] = useState({
+    title: '',
+    description: '',
+    category: 'growth',
+    icon: 'ðŸŽ¯',
+    targetDate: '',
+    isSmartGoal: false,
+    smart: {},
+    milestones: [],
+    linkedHabitIds: []
+  });
   
   const canAccess = hasFeature('goals');
   
@@ -80,7 +91,7 @@ const GoalsPage = () => {
     toast.success('Goal completed! 🎉');
   };
   
-  const [newGoal, setNewGoal] = useState({
+  const _legacyNewGoalShape = {
     title: '',
     description: '',
     category: 'growth',
@@ -90,7 +101,7 @@ const GoalsPage = () => {
     smart: {},
     milestones: [],
     linkedHabitIds: []
-  });
+  };
   
   const addMilestone = () => {
     setNewGoal(prev => ({

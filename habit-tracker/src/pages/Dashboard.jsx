@@ -30,7 +30,7 @@ import { loadPoints, deductPoints, addPoints } from '../utils/pointsUtils';
 import { getYesterdayISO, getTodayISO, formatDate, formatISODate, getStartOfWeek } from '../utils/dateUtils';
 import { getTotalBadgesEarned, getEarnedBadges, getNextBadge } from '../utils/badgeUtils';
 import { getWeekCompletions, categorizeTodayHabits } from '../utils/streakUtils';
-import { getTimeRemainingToday, checkAndAutoExpire } from '../utils/midnightUtils';
+import { getTimeRemainingToday } from '../utils/midnightUtils';
 import { getHabitDeadline, getTimeRemaining } from '../utils/countdownUtils';
 import { getPersonalizedGreeting, getMotivationalSubtext, getWeekCompletionRate, getDaysTracked } from '../utils/greetingUtils';
 import { isEmergencyModeActive, saveEmergencyMode, checkAndResetExpiredEmergencyMode, getTop3Habits } from '../utils/emergencyUtils';
@@ -137,13 +137,13 @@ const Dashboard = () => {
           const isForToday = created.toISOString().split('T')[0] === today;
           const wasNotCompleted = !habit.completionLog?.[today];
           if (isForToday && wasNotCompleted && hoursSinceCreation > CAN_COMPLETE_HOURS && hoursSinceCreation < CAN_COMPLETE_HOURS + 1) {
-            contextToggleHabit(habit.id, today, true);
+            toggleHabit(habit.id, today, true);
           }
         }
       });
     };
     checkAndExpireHabits();
-  }, []);
+  }, [safeHabits, toggleHabit]);
 
   useEffect(() => {
     if (isReviewDay() && safeHabits.length > 0) {
@@ -258,7 +258,6 @@ const Dashboard = () => {
           onDeactivate={() => {
             saveEmergencyMode(false);
             setEmergencyActive(false);
-            window.location.reload();
           }} 
         />
       )}
@@ -390,7 +389,6 @@ const Dashboard = () => {
                 <EmergencyModeToggle 
                   onToggle={(active) => {
                     setEmergencyActive(active);
-                    window.location.reload();
                   }} 
                 />
                 {pendingHabits.length > 0 && (

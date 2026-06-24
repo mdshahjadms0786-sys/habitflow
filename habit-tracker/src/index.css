@@ -2,10 +2,12 @@
   /* Light Theme Colors */
   --bg: #f8fafc;
   --bg-secondary: #f1f5f9;
+  --color-background-secondary: #f1f5f9;
   --surface: #ffffff;
   --text: #0f172a;
   --text-secondary: #64748b;
   --border: #e2e8f0;
+  --color-border-tertiary: #d1d5db;
   --primary: #6366f1;
   --primary-hover: #4f46e5;
 
@@ -59,10 +61,12 @@
 .dark {
   --bg: #0f172a;
   --bg-secondary: #1e293b;
+  --color-background-secondary: #1e293b;
   --surface: #1e293b;
   --text: #f8fafc;
   --text-secondary: #94a3b8;
   --border: #334155;
+  --color-border-tertiary: #475569;
 
   /* Heatmap Colors for Dark Mode */
   --heatmap-0: #161b22;

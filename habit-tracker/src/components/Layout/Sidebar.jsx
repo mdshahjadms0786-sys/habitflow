@@ -372,7 +372,7 @@ const Sidebar = memo(() => {
       >
         <PlanBadge size="small" />
         <p style={{ margin: '8px 0 0 0', fontSize: '11px', color: 'var(--text-secondary)' }}>
-          v2.0.0 • Built with React
+          v1.0.0 • Built with React
         </p>
       </div>
     </aside>

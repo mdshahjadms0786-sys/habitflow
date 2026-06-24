@@ -36,7 +36,7 @@ export default function ResetPasswordPage() {
       setTimeout(() => {
         setChecking(false)
         if (authData?.subscription) authData.subscription.unsubscribe()
-      }, 3000)
+      }, 15000)
     }
     checkSession()
   }, [])

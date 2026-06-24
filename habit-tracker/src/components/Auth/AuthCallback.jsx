@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../services/supabaseClient'
 import logger from '../../utils/logger'
 
 const AuthCallback = () => {
+  const navigate = useNavigate()
   const handled = useRef(false)
 
   useEffect(() => {
@@ -37,8 +39,7 @@ const AuthCallback = () => {
             logger.error('Profile creation error:', err)
           }
 
-          // Full page reload so AuthContext picks up the new session
-          window.location.replace('/')
+          navigate('/', { replace: true })
         }
       }
     )
@@ -60,7 +61,7 @@ const AuthCallback = () => {
         logger.error('Auth callback fallback error:', err)
       }
       
-      window.location.replace('/')
+      navigate('/', { replace: true })
     }, 6000)
 
     return () => {

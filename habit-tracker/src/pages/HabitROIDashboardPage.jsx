@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { usePlanContext } from '../context/PlanContext';
 import { useHabitContext } from '../context/HabitContext';
@@ -22,6 +22,12 @@ function HabitROIDashboardPage() {
   const [totalImpact, setTotalImpact] = useState(0);
   const [lifetimeImpact, setLifetimeImpact] = useState(0);
 
+  useEffect(() => {
+    if (hasFeature('habitROIDashboard')) {
+      calculateROI();
+    }
+  }, [habits, hasFeature]);
+
   if (!hasFeature('habitROIDashboard')) {
     return (
       <div style={{ padding: '24px', textAlign: 'center' }}>
@@ -30,10 +36,6 @@ function HabitROIDashboardPage() {
       </div>
     );
   }
-
-  useEffect(() => {
-    calculateROI();
-  }, [habits]);
 
   const calculateROI = () => {
     const roiData = habits.map(habit => {

@@ -25,6 +25,17 @@ const Analytics = () => {
 
   const isProUser = hasFeature('fullAnalytics');
 
+  const moodChartData = useMemo(() => {
+    const all30 = getLast30DaysMoods(moodLog || {});
+    return all30.slice(-14).map((d) => ({
+      date: d.date,
+      label: d.day,
+      score: d.mood ? d.mood.id : null,
+      emoji: d.mood ? d.mood.emoji : '',
+      moodLabel: d.mood ? d.mood.label : '',
+    }));
+  }, [moodLog]);
+
   if (!isProUser) {
     return (
       <div className="page-container" style={{ padding: '24px', paddingBottom: '80px' }}>
@@ -92,17 +103,6 @@ const Analytics = () => {
       </div>
     );
   }
-
-  const moodChartData = useMemo(() => {
-    const all30 = getLast30DaysMoods(moodLog || {});
-    return all30.slice(-14).map((d) => ({
-      date: d.date,
-      label: d.day,
-      score: d.mood ? d.mood.id : null,
-      emoji: d.mood ? d.mood.emoji : '',
-      moodLabel: d.mood ? d.mood.label : '',
-    }));
-  }, [moodLog]);
 
   const summaryStats = useMemo(
     () => [

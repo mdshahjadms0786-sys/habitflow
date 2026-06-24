@@ -12,6 +12,16 @@ const DreamDiaryPage = () => {
   const [showMorning, setShowMorning] = useState(false);
   const [showEvening, setShowEvening] = useState(false);
 
+  useEffect(() => {
+    if (!hasFeature('dreamDiary')) return;
+
+    setEntries(loadDiaryEntries());
+    
+    const todayEntries = getTodayEntries();
+    if (!todayEntries.morning) setShowMorning(true);
+    if (!todayEntries.evening) setShowEvening(true);
+  }, []);
+
   if (!hasFeature('dreamDiary')) {
     return (
       <div style={{
@@ -46,14 +56,6 @@ const DreamDiaryPage = () => {
       </div>
     );
   }
-
-  useEffect(() => {
-    setEntries(loadDiaryEntries());
-    
-    const todayEntries = getTodayEntries();
-    if (!todayEntries.morning) setShowMorning(true);
-    if (!todayEntries.evening) setShowEvening(true);
-  }, []);
 
   const patterns = getPatterns(entries);
 
