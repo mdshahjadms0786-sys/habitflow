@@ -4,6 +4,7 @@ import { CategoryBadge, PriorityBadge } from '../UI/Badge';
 import useOllama from '../../hooks/useOllama';
 import { v4 as uuidv4 } from 'uuid';
 import { getTodayISO } from '../../utils/dateUtils';
+import { hasFeature } from '../../utils/planUtils';
 
 const categoryColors = {
   Health: '#14b8a6',
@@ -18,8 +19,16 @@ export const OllamaModal = ({ isOpen, onClose, onAddHabits }) => {
   const [suggestions, setSuggestions] = useState(null);
   const { fetchSuggestions, loading, error } = useOllama();
 
+  const [planError, setPlanError] = useState('');
+
   const handleGetSuggestions = async () => {
     if (!goal.trim()) return;
+    setPlanError('');
+
+    if (!hasFeature('aiCoach')) {
+      setPlanError('AI Habit Suggestions is available on Pro and Elite plans only. Please upgrade to use this feature.');
+      return;
+    }
 
     const result = await fetchSuggestions(goal);
     if (result) {
@@ -183,19 +192,23 @@ export const OllamaModal = ({ isOpen, onClose, onAddHabits }) => {
                 </div>
               </div>
 
-              {error && (
+              {(planError || error) && (
                 <div
                   style={{
                     padding: '12px',
-                    backgroundColor: '#fef2f2',
-                    border: '1px solid #fecaca',
+                    backgroundColor: planError ? '#fffbeb' : '#fef2f2',
+                    border: planError ? '1px solid #fde68a' : '1px solid #fecaca',
                     borderRadius: '8px',
-                    color: '#dc2626',
+                    color: planError ? '#92400e' : '#dc2626',
                     fontSize: '13px',
                     marginBottom: '16px',
                   }}
                 >
-                  <strong>Error:</strong> Could not get suggestions. {error}
+                  {planError ? (
+                    <>{planError}</>
+                  ) : (
+                    <><strong>Error:</strong> Could not get suggestions. {error}</>
+                  )}
                 </div>
               )}
 
