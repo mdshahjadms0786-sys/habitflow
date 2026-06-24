@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import HabitCard from './HabitCard';
 import EmptyState from '../UI/EmptyState';
 
