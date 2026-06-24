@@ -515,28 +515,35 @@ const HabitTemplates = ({ onAddTemplate, currentHabitsCount = 0 }) => {
     return { found: results.slice(0, 10), generated: null };
   }, [searchQuery]);
 
+  const hasReachedLimit = currentHabitsCount >= maxAllowed;
+
   const addHabit = (habit, packName = null) => {
-    if (currentHabitsCount >= maxAllowed) {
+    if (hasReachedLimit) {
       toast.error(`Habit limit reached! Upgrade to add more.`);
       return;
     }
-    const newHabit = {
-      id: uuidv4(),
-      name: habit.name,
-      icon: habit.icon,
-      category: habit.category,
-      difficulty: habit.difficulty,
-      notes: habit.notes || '',
-      priority: 'Medium',
-      points: habit.points || 25,
-      isActive: true,
-      createdAt: getTodayISO(),
-      completionLog: {},
-      currentStreak: 0,
-      longestStreak: 0,
-    };
-    onAddTemplate([newHabit]);
-    toast.success(`✓ Added: ${habit.name}${packName ? ` from ${packName}` : ''}`);
+    try {
+      const newHabit = {
+        id: uuidv4(),
+        name: habit.name,
+        icon: habit.icon || '⭐',
+        category: habit.category || 'Personal',
+        difficulty: habit.difficulty || 'medium',
+        notes: habit.notes || '',
+        priority: 'Medium',
+        points: habit.points || 25,
+        isActive: true,
+        createdAt: getTodayISO(),
+        completionLog: {},
+        currentStreak: 0,
+        longestStreak: 0,
+      };
+      onAddTemplate([newHabit]);
+      toast.success(`✓ Added: ${habit.name}${packName ? ` from ${packName}` : ''}`);
+    } catch (err) {
+      console.error('Error adding habit:', err);
+      toast.error('Failed to add habit. Please try again.');
+    }
   };
 
   const addAllFromPack = (pack) => {
@@ -544,23 +551,28 @@ const HabitTemplates = ({ onAddTemplate, currentHabitsCount = 0 }) => {
       toast.error(`Cannot add ${pack.habits.length} habits. It exceeds your limit!`);
       return;
     }
-    const newHabits = pack.habits.map(habit => ({
-      id: uuidv4(),
-      name: habit.name,
-      icon: habit.icon,
-      category: habit.category,
-      difficulty: habit.difficulty,
-      notes: habit.notes || '',
-      priority: 'Medium',
-      points: habit.points || 25,
-      isActive: true,
-      createdAt: getTodayISO(),
-      completionLog: {},
-      currentStreak: 0,
-      longestStreak: 0,
-    }));
-    onAddTemplate(newHabits);
-    toast.success(`✓ Added ${pack.habits.length} habits from ${pack.name}! 🎉`);
+    try {
+      const newHabits = pack.habits.map(habit => ({
+        id: uuidv4(),
+        name: habit.name,
+        icon: habit.icon || '⭐',
+        category: habit.category || 'Personal',
+        difficulty: habit.difficulty || 'medium',
+        notes: habit.notes || '',
+        priority: 'Medium',
+        points: habit.points || 25,
+        isActive: true,
+        createdAt: getTodayISO(),
+        completionLog: {},
+        currentStreak: 0,
+        longestStreak: 0,
+      }));
+      onAddTemplate(newHabits);
+      toast.success(`✓ Added ${pack.habits.length} habits from ${pack.name}! 🎉`);
+    } catch (err) {
+      console.error('Error adding pack:', err);
+      toast.error('Failed to add pack. Please try again.');
+    }
   };
 
   return (
@@ -639,21 +651,29 @@ const HabitTemplates = ({ onAddTemplate, currentHabitsCount = 0 }) => {
                   </span>
                 </div>
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => addHabit(searchResults.generated)}
+                  whileHover={{ scale: hasReachedLimit ? 1 : 1.05 }}
+                  whileTap={{ scale: hasReachedLimit ? 1 : 0.95 }}
+                  onClick={() => {
+                    if (hasReachedLimit) {
+                      toast.error(`Habit limit reached! Upgrade to add more.`);
+                      return;
+                    }
+                    addHabit(searchResults.generated);
+                  }}
+                  disabled={hasReachedLimit}
                   style={{
-                    background: '#10B981',
+                    background: hasReachedLimit ? '#9CA3AF' : '#10B981',
                     color: 'white',
                     border: 'none',
                     borderRadius: '6px',
                     padding: '6px 12px',
                     fontSize: '12px',
                     fontWeight: 600,
-                    cursor: 'pointer',
+                    cursor: hasReachedLimit ? 'not-allowed' : 'pointer',
+                    opacity: hasReachedLimit ? 0.5 : 1,
                   }}
                 >
-                  Add
+                  {hasReachedLimit ? '🔒' : 'Add'}
                 </motion.button>
               </div>
             </div>
@@ -673,20 +693,28 @@ const HabitTemplates = ({ onAddTemplate, currentHabitsCount = 0 }) => {
                     </span>
                   </div>
                   <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => addHabit(habit, habit.packName)}
+                    whileHover={{ scale: hasReachedLimit ? 1 : 1.1 }}
+                    whileTap={{ scale: hasReachedLimit ? 1 : 0.9 }}
+                    onClick={() => {
+                      if (hasReachedLimit) {
+                        toast.error(`Habit limit reached! Upgrade to add more.`);
+                        return;
+                      }
+                      addHabit(habit, habit.packName);
+                    }}
+                    disabled={hasReachedLimit}
                     style={{
-                      background: 'transparent',
-                      border: '1px solid var(--border)',
+                      background: hasReachedLimit ? '#9CA3AF' : 'transparent',
+                      border: `1px solid ${hasReachedLimit ? '#9CA3AF' : 'var(--border)'}`,
                       borderRadius: '6px',
                       width: '28px',
                       height: '28px',
-                      cursor: 'pointer',
+                      cursor: hasReachedLimit ? 'not-allowed' : 'pointer',
                       fontSize: '14px',
+                      opacity: hasReachedLimit ? 0.5 : 1,
                     }}
                   >
-                    +
+                    {hasReachedLimit ? '🔒' : '+'}
                   </motion.button>
                 </div>
               ))}
@@ -702,6 +730,7 @@ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
       }}>
         {allowedPacks.map((pack, index) => {
           const isAccessible = isPackAccessible(index);
+          const canAddSingle = isAccessible && !hasReachedLimit;
           return (
             <motion.div
               key={pack.id}
@@ -817,29 +846,33 @@ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
                             +{habit.points}
                           </span>
                           <motion.button
-                            whileHover={{ scale: isAccessible ? 1.1 : 1 }}
-                            whileTap={{ scale: isAccessible ? 0.9 : 1 }}
+                            whileHover={{ scale: canAddSingle ? 1.1 : 1 }}
+                            whileTap={{ scale: canAddSingle ? 0.9 : 1 }}
                             onClick={(e) => {
                               e.stopPropagation();
                               if (!isAccessible) {
                                 navigate('/upgrade');
                                 return;
                               }
+                              if (hasReachedLimit) {
+                                toast.error(`Habit limit reached! Upgrade to add more.`);
+                                return;
+                              }
                               addHabit(habit, pack.name);
                             }}
-                            disabled={!isAccessible}
+                            disabled={!canAddSingle}
                             style={{
-                              background: isAccessible ? 'transparent' : '#9CA3AF',
-                              border: `1px solid ${isAccessible ? 'var(--border)' : '#9CA3AF'}`,
+                              background: canAddSingle ? 'transparent' : '#9CA3AF',
+                              border: `1px solid ${canAddSingle ? 'var(--border)' : '#9CA3AF'}`,
                               borderRadius: '5px',
                               width: '24px',
                               height: '24px',
-                              cursor: isAccessible ? 'pointer' : 'not-allowed',
+                              cursor: canAddSingle ? 'pointer' : 'not-allowed',
                               fontSize: '12px',
-                              opacity: isAccessible ? 1 : 0.5,
+                              opacity: canAddSingle ? 1 : 0.5,
                             }}
                           >
-                            {isAccessible ? '+' : '🔒'}
+                            {canAddSingle ? '+' : '🔒'}
                           </motion.button>
                         </div>
                       ))}

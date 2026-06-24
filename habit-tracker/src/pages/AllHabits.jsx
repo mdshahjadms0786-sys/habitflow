@@ -80,10 +80,18 @@ const AllHabits = () => {
   };
 
   const handleAddTemplate = (newHabits) => {
+    let added = 0;
     newHabits.forEach(habit => {
-      addHabit(habit);
+      try {
+        addHabit(habit);
+        added++;
+      } catch (err) {
+        logger.error('Failed to add habit from template:', err);
+      }
     });
-    toast.success(`Added ${newHabits.length} habits from template!`);
+    if (added > 0) {
+      toast.success(`Added ${added} habit${added > 1 ? 's' : ''} from template!`);
+    }
   };
 
   const handleEditHabit = (habit) => {

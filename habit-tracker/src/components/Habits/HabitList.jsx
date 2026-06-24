@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import HabitCard from './HabitCard';
+import EmptyState from '../UI/EmptyState';
 
 const HabitList = memo(({ habits, onToggle, onEdit, onDelete }) => {
   if (!habits || habits.length === 0) {
