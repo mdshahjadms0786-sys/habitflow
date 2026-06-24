@@ -5,6 +5,7 @@ import { loadCertifications } from '../utils/certificationUtils';
 import { getTotalPoints } from '../utils/pointsUtils';
 import EditProfileModal from '../components/Profile/EditProfileModal';
 import PlanBadge from '../components/UI/PlanBadge';
+import ReferralSection from '../components/Social/ReferralSection';
 
 const GOALS_MAP = {
   fitness: { name: 'Get Fit & Healthy', icon: '💪', color: '#10b981' },
@@ -259,7 +260,11 @@ const ProfilePage = () => {
           ))}
         </div>
       </div>
-      
+
+      <div style={{ marginBottom: '24px' }}>
+        <ReferralSection />
+      </div>
+
       <EditProfileModal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}

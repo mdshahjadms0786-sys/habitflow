@@ -64,6 +64,10 @@ export const PointsProvider = ({ children }) => {
             }
             refreshPoints();
           }
+          if (profile.referral_code) {
+            localStorage.setItem('ht_referral_code', profile.referral_code);
+            setReferralCode(profile.referral_code);
+          }
         }
       };
       fetchSupabase();
@@ -99,6 +103,18 @@ export const PointsProvider = ({ children }) => {
     return remaining;
   }, [refreshPoints]);
 
+  const sendReferral = useCallback(() => {
+    const pts = pointsUtils.addReferral('sent');
+    refreshPoints();
+    return pts;
+  }, [refreshPoints]);
+
+  const redeemReferral = useCallback(() => {
+    const pts = pointsUtils.addReferral('completed');
+    refreshPoints();
+    return pts;
+  }, [refreshPoints]);
+
   const value = {
     totalPoints,
     currentLevel,
@@ -111,6 +127,8 @@ export const PointsProvider = ({ children }) => {
     referralStats,
     awardPoints,
     spendPoints,
+    sendReferral,
+    redeemReferral,
     refreshPoints,
     LEVELS: pointsUtils.LEVELS,
     POINTS_CONFIG: pointsUtils.POINTS_CONFIG,

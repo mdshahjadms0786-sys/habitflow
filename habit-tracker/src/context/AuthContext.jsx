@@ -77,14 +77,17 @@ export function AuthProvider({ children }) {
       toast.error(error.message);
     } else {
       if (data?.user) {
+        const referralCode = 'HF-' + Math.random().toString(36).substring(2, 8).toUpperCase();
         await supabase
           .from('user_profiles')
           .insert({
             id: data.user.id,
             plan: 'free',
+            referral_code: referralCode,
             total_points: 0,
             current_level: 1
           });
+        localStorage.setItem('ht_referral_code', referralCode);
       }
       toast.success('Sign up successful! Please check your email to verify.');
     }

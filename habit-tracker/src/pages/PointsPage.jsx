@@ -36,16 +36,18 @@ const PointsPage = () => {
   const {
     totalPoints, currentLevel, nextLevel, progress, pointsToNext,
     earnedToday, history, referralCode, referralStats,
-    sendReferral, LEVELS, PLAN_MULTIPLIERS,
+    sendReferral, redeemReferral, LEVELS, PLAN_MULTIPLIERS,
   } = usePointsContext();
-  const { currentPlan } = usePlanContext();
+  const { currentPlan, planData } = usePlanContext();
   const [tab, setTab] = useState(TAB_ALL);
 
   const planColor = currentPlan === 'elite' ? '#BA7517' : currentPlan === 'pro' ? '#534AB7' : '#22c55e';
   const multiplier = PLAN_MULTIPLIERS[currentPlan] || 1;
+  const referralReward = currentPlan === 'elite' ? 150 : currentPlan === 'pro' ? 100 : 50;
 
   const copyReferral = () => {
-    navigator.clipboard.writeText(`Join HabitFlow with my code: ${referralCode}`);
+    const text = `Join HabitFlow with my code: ${referralCode} and get ${referralReward} free points! 🔥`;
+    navigator.clipboard.writeText(text);
     toast.success('Referral link copied! 📋');
     sendReferral();
   };
@@ -322,10 +324,15 @@ const PointsPage = () => {
             textAlign: 'center',
           }}>
             <div style={{ fontSize: '40px', marginBottom: '12px' }}>🎁</div>
-            <h4 style={{ fontWeight: 700, fontSize: '18px', marginBottom: '8px' }}>Earn 100 pts per referral!</h4>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '20px' }}>
-              Share your code. When someone joins & completes onboarding, you both earn points.
+            <h4 style={{ fontWeight: 700, fontSize: '18px', marginBottom: '8px' }}>Earn {referralReward} pts per referral!</h4>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '12px' }}>
+              Share your code. When someone joins, you both earn points!
             </p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '20px', fontSize: '12px' }}>
+              <span style={{ color: '#888780' }}>🆓 Free: 50 pts</span>
+              <span style={{ color: '#534AB7' }}>💎 Pro: 100 pts</span>
+              <span style={{ color: '#BA7517' }}>👑 Elite: 150 pts</span>
+            </div>
             <div style={{
               background: 'var(--surface)',
               borderRadius: '12px',
@@ -367,7 +374,7 @@ const PointsPage = () => {
             }}>
               <div style={{ fontSize: '32px', fontWeight: 800, color: '#534AB7' }}>{referralStats.sent || 0}</div>
               <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>Referrals Sent</div>
-              <div style={{ fontSize: '12px', color: '#534AB7', marginTop: '4px' }}>+{(referralStats.sent || 0) * 10} pts earned</div>
+              <div style={{ fontSize: '12px', color: '#534AB7', marginTop: '4px' }}>+{(referralStats.sent || 0) * 10} pts earned (bonus)</div>
             </div>
             <div style={{
               background: 'var(--surface)',
@@ -378,7 +385,7 @@ const PointsPage = () => {
             }}>
               <div style={{ fontSize: '32px', fontWeight: 800, color: '#22c55e' }}>{referralStats.completed || 0}</div>
               <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>Referrals Joined</div>
-              <div style={{ fontSize: '12px', color: '#22c55e', marginTop: '4px' }}>+{(referralStats.completed || 0) * 100} pts earned</div>
+              <div style={{ fontSize: '12px', color: '#22c55e', marginTop: '4px' }}>+{(referralStats.completed || 0) * referralReward} pts earned</div>
             </div>
           </div>
         </div>

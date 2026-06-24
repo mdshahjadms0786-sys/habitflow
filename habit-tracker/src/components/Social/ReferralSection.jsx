@@ -1,23 +1,26 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  getUserProfile, 
-  createUserProfile, 
-  generateShareableLink, 
+import {
+  getReferralCode,
   getReferralStats,
+  saveReferralStats,
   applyReferralCode,
-  REFERRAL_REWARD 
+  generateShareableLink,
 } from '../../utils/referralUtils';
 import { addPoints } from '../../utils/pointsUtils';
+import { usePlanContext } from '../../context/PlanContext';
 import toast from 'react-hot-toast';
 
 const ReferralSection = ({ compact = false }) => {
   const [codeInput, setCodeInput] = useState('');
   const [applying, setApplying] = useState(false);
+  const { currentPlan } = usePlanContext();
 
-  const profile = getUserProfile() || createUserProfile();
+  const referralCode = getReferralCode();
   const stats = getReferralStats();
   const shareData = generateShareableLink();
+
+  const referralReward = currentPlan === 'elite' ? 150 : currentPlan === 'pro' ? 100 : 50;
 
   const handleApplyCode = () => {
     if (!codeInput || codeInput.length < 4) {
@@ -25,13 +28,12 @@ const ReferralSection = ({ compact = false }) => {
       return;
     }
 
-    if (profile.referralUsed) {
+    if (localStorage.getItem('ht_referral_used')) {
       toast.error('You have already used a referral code');
       return;
     }
 
     const result = applyReferralCode(codeInput);
-    
     if (result.success) {
       addPoints(result.bonus, 'Referral Bonus');
       toast.success(`🎉 You got ${result.bonus} free points!`);
@@ -43,15 +45,16 @@ const ReferralSection = ({ compact = false }) => {
   };
 
   const handleShare = () => {
+    const text = `Join HabitFlow with my code: ${referralCode} and get ${referralReward} free points! 🔥`;
     if (navigator.share) {
       navigator.share({
         title: 'Daily Habit Tracker',
-        text: `Join me on Daily Habit Tracker! Use code: ${shareData.code} to get ${shareData.reward} free points! 🔥`,
+        text,
         url: shareData.link,
       }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(shareData.code);
-      toast.success(`Code copied: ${shareData.code}`);
+      navigator.clipboard.writeText(text);
+      toast.success(`Referral code copied: ${referralCode}`);
     }
   };
 
@@ -72,7 +75,7 @@ const ReferralSection = ({ compact = false }) => {
           <div style={{ flex: 1 }}>
             <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)' }}>Refer & Earn</p>
             <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: 'var(--text)' }}>
-              {stats.totalReferrals} friends • {stats.totalBonusEarned} pts
+              Code: {referralCode} • +{referralReward} pts
             </p>
           </div>
           <motion.button
@@ -115,7 +118,7 @@ const ReferralSection = ({ compact = false }) => {
             Refer Friends & Earn
           </p>
           <p style={{ margin: 0, fontSize: '11px', color: 'var(--text-secondary)' }}>
-            Get {REFERRAL_REWARD} points per friend
+            Get {referralReward} points per friend
           </p>
         </div>
       </div>
@@ -128,15 +131,21 @@ const ReferralSection = ({ compact = false }) => {
         textAlign: 'center',
       }}>
         <p style={{ margin: 0, fontSize: '11px', color: 'var(--text-secondary)' }}>Your Code</p>
-        <p style={{ 
-          margin: '4px 0 0 0', 
-          fontSize: '24px', 
-          fontWeight: '700', 
+        <p style={{
+          margin: '4px 0 0 0',
+          fontSize: '24px',
+          fontWeight: '700',
           color: '#8b5cf6',
           letterSpacing: '2px',
         }}>
-          {shareData.code}
+          {referralCode}
         </p>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '12px', fontSize: '11px' }}>
+        <span style={{ color: '#888780' }}>🆓 Free: 50pts</span>
+        <span style={{ color: '#534AB7' }}>💎 Pro: 100pts</span>
+        <span style={{ color: '#BA7517' }}>👑 Elite: 150pts</span>
       </div>
 
       <motion.button
@@ -160,7 +169,7 @@ const ReferralSection = ({ compact = false }) => {
         📤 Share Code
       </motion.button>
 
-      {!profile.referralUsed && (
+      {!localStorage.getItem('ht_referral_used') ? (
         !applying ? (
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -243,16 +252,14 @@ const ReferralSection = ({ compact = false }) => {
             </div>
           </div>
         )
-      )}
-
-      {profile.referralUsed && (
+      ) : (
         <p style={{ margin: 0, fontSize: '11px', color: '#22c55e', textAlign: 'center' }}>
           ✓ Referral code applied!
         </p>
       )}
 
-      <div style={{ 
-        display: 'flex', 
+      <div style={{
+        display: 'flex',
         justifyContent: 'space-around',
         marginTop: '16px',
         paddingTop: '16px',
@@ -260,15 +267,21 @@ const ReferralSection = ({ compact = false }) => {
       }}>
         <div style={{ textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#8b5cf6' }}>
-            {stats.totalReferrals}
+            {stats.sent || 0}
           </p>
-          <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-secondary)' }}>Referrals</p>
+          <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-secondary)' }}>Sent</p>
         </div>
         <div style={{ textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#22c55e' }}>
-            +{stats.totalBonusEarned}
+            {stats.completed || 0}
           </p>
-          <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-secondary)' }}>Points Earned</p>
+          <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-secondary)' }}>Joined</p>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#f59e0b' }}>
+            +{(stats.completed || 0) * referralReward}
+          </p>
+          <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-secondary)' }}>Pts Earned</p>
         </div>
       </div>
     </motion.div>
