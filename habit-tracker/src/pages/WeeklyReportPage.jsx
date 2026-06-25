@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { useHabits } from '../hooks/useHabits';
 import { useMoodContext } from '../context/MoodContext';
 import toast from 'react-hot-toast';
