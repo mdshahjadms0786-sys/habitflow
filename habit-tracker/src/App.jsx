@@ -138,7 +138,7 @@ function AppContent() {
   }, [user, authLoading, isProfileLoading, navigate]);
 
   const currentPath = window.location.pathname;
-  const hideNavigation = currentPath === '/landing' || currentPath === '/onboarding' || currentPath === '/auth/callback';
+  const hideNavigation = currentPath === '/landing' || currentPath === '/onboarding' || currentPath === '/auth/callback' || currentPath === '/login' || currentPath === '/forgot-password' || currentPath === '/reset-password';
 
   useEffect(() => {
     const handleKeyDown = (e) => {
