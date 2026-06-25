@@ -279,7 +279,7 @@ const ReferralSection = ({ compact = false }) => {
         </div>
         <div style={{ textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#f59e0b' }}>
-            +{(stats.completed || 0) * referralReward}
+            +{(stats.completed || 0) * referralReward + (stats.bonus || 0)}
           </p>
           <p style={{ margin: 0, fontSize: '10px', color: 'var(--text-secondary)' }}>Pts Earned</p>
         </div>

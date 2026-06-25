@@ -24,6 +24,8 @@ export const applyReferralCode = (code) => {
   localStorage.setItem('ht_referred_by', code.toUpperCase());
   const currentPlan = localStorage.getItem('ht_plan') || 'free';
   const bonus = getReward(currentPlan);
+  const prevBonus = parseInt(localStorage.getItem('ht_referral_bonus') || '0');
+  localStorage.setItem('ht_referral_bonus', String(prevBonus + bonus));
   return { success: true, bonus };
 };
 
@@ -31,9 +33,11 @@ export const getReferralCode = () => getCode();
 
 export const getReferralStats = () => {
   try {
-    return JSON.parse(localStorage.getItem('ht_referrals') || '{"sent":0,"completed":0}');
+    const stats = JSON.parse(localStorage.getItem('ht_referrals') || '{"sent":0,"completed":0}');
+    stats.bonus = parseInt(localStorage.getItem('ht_referral_bonus') || '0');
+    return stats;
   } catch {
-    return { sent: 0, completed: 0 };
+    return { sent: 0, completed: 0, bonus: 0 };
   }
 };
 
