@@ -9,7 +9,6 @@ export const usePWA = () => {
   const [isInstalled, setIsInstalled] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [isDismissed, setIsDismissed] = useState(false);
-  const [waitingWorker, setWaitingWorker] = useState(null);
 
   // Check if dismissed
   useEffect(() => {
@@ -61,35 +60,14 @@ export const usePWA = () => {
     };
   }, []);
 
-  // Listen for service worker updates
+  // Auto-reload when a new service worker takes control
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       const handleControllerChange = () => {
-        navigator.serviceWorker.ready.then((reg) => {
-          if (reg.waiting) {
-            setWaitingWorker(reg.waiting);
-          }
-        });
+        window.location.reload();
       };
 
       navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
-
-      navigator.serviceWorker.ready.then((reg) => {
-        if (reg.waiting) {
-          setWaitingWorker(reg.waiting);
-        }
-
-        reg.addEventListener('updatefound', () => {
-          const newWorker = reg.installing;
-          if (newWorker) {
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                setWaitingWorker(newWorker);
-              }
-            });
-          }
-        });
-      });
 
       return () => {
         navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
@@ -115,24 +93,11 @@ export const usePWA = () => {
     localStorage.setItem(DISMISSAL_KEY, JSON.stringify({ timestamp: Date.now() }));
   }, []);
 
-  const skipWaiting = useCallback(() => {
-    if (waitingWorker) {
-      waitingWorker.postMessage({ type: 'SKIP_WAITING' });
-      waitingWorker.addEventListener('statechange', (e) => {
-        if (e.target.state === 'activated') {
-          window.location.reload();
-        }
-      });
-    }
-  }, [waitingWorker]);
-
   return {
     isInstallable: isInstallable && !isDismissed,
     isInstalled,
     isOffline,
-    waitingWorker,
     installApp,
     dismissInstall,
-    skipWaiting,
   };
 };

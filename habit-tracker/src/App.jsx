@@ -103,10 +103,8 @@ function AppContent() {
   const {
     isInstallable,
     isOffline,
-    waitingWorker,
     installApp,
     dismissInstall,
-    skipWaiting,
   } = usePWA();
 
   useEffect(() => {
@@ -304,7 +302,7 @@ function AppContent() {
         onInstall={installApp}
         onDismiss={dismissInstall}
       />
-      <UpdatePrompt waitingWorker={waitingWorker} onUpdate={skipWaiting} />
+      <UpdatePrompt />
       <HelpButton />
 
       <Toaster
