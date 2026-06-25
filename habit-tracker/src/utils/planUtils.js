@@ -85,7 +85,7 @@ export const PLANS = {
       apiAccess: false,
       teamSpaces: false,
       pushNotifications: false,
-      weatherSync: false,
+      weatherSync: true,
       prioritySupport: false,
       allTemplates: false,
       customTemplates: false,

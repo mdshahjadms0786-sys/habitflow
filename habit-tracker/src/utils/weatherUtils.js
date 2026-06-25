@@ -15,7 +15,7 @@ export const getUserLocation = () => {
 
 const getIPLocation = async () => {
   try {
-    const res = await fetch('http://ip-api.com/json/?fields=lat,lon');
+    const res = await fetch('https://ip-api.com/json/?fields=lat,lon');
     const data = await res.json();
     if (data.lat && data.lon) return { lat: data.lat, lon: data.lon };
   } catch {}
