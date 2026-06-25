@@ -8,6 +8,7 @@ const LandingPage = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [activeFAQ, setActiveFAQ] = useState(null);
   const [statsCount, setStatsCount] = useState({ users: 0, habits: 0, streaks: 0 });
+  const [showPlanModal, setShowPlanModal] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -143,7 +144,7 @@ const LandingPage = () => {
           </div>
         </motion.div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button onClick={() => navigate('/login')} style={{ background: 'transparent', border: 'none', color: 'var(--text)', cursor: 'pointer', fontWeight: 600, fontSize: '15px', padding: '8px 16px' }}>Login</button>
+          <button onClick={() => setShowPlanModal(true)} style={{ background: 'transparent', border: 'none', color: 'var(--text)', cursor: 'pointer', fontWeight: 600, fontSize: '15px', padding: '8px 16px' }}>Login</button>
           <button 
             onClick={() => document.getElementById('plans-section').scrollIntoView({ behavior: 'smooth' })} 
             style={{ 
@@ -695,6 +696,120 @@ const LandingPage = () => {
           © 2026 HabitFlow. All rights reserved.
         </div>
       </footer>
+
+      {/* PLAN SELECT MODAL */}
+      <AnimatePresence>
+        {showPlanModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowPlanModal(false)}
+            style={{
+              position: 'fixed', inset: 0, zIndex: 9999,
+              backgroundColor: 'rgba(0,0,0,0.6)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '20px',
+              backdropFilter: 'blur(4px)',
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 30 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 30 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                backgroundColor: 'var(--surface)',
+                borderRadius: '20px',
+                padding: '32px',
+                maxWidth: '520px',
+                width: '100%',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+              }}
+            >
+              <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+                <h2 style={{ margin: '0 0 8px', fontSize: '1.5rem', fontWeight: 700 }}>Choose Your Plan</h2>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+                  Select a plan to get started with HabitFlow
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleSelectPlan('free')}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '16px',
+                    padding: '20px', borderRadius: '14px',
+                    background: 'var(--bg)', border: '2px solid var(--border)',
+                    cursor: 'pointer', textAlign: 'left', width: '100%',
+                  }}
+                >
+                  <div style={{ fontSize: '32px' }}>🆓</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text)', marginBottom: '4px' }}>Free Forever</div>
+                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>₹0/month – 3 habits, basic tracking</div>
+                  </div>
+                  <div style={{ color: '#888780', fontWeight: 600, fontSize: '0.9rem' }}>50 pts</div>
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleSelectPlan('pro')}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '16px',
+                    padding: '20px', borderRadius: '14px',
+                    background: 'var(--bg)', border: '2px solid #534AB7',
+                    cursor: 'pointer', textAlign: 'left', width: '100%',
+                  }}
+                >
+                  <div style={{ fontSize: '32px' }}>💎</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text)', marginBottom: '4px' }}>Pro</div>
+                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>₹199/month – Unlimited habits, AI Coach</div>
+                  </div>
+                  <div style={{ color: '#534AB7', fontWeight: 600, fontSize: '0.9rem' }}>100 pts</div>
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleSelectPlan('elite')}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '16px',
+                    padding: '20px', borderRadius: '14px',
+                    background: 'var(--bg)', border: '2px solid #BA7517',
+                    cursor: 'pointer', textAlign: 'left', width: '100%',
+                  }}
+                >
+                  <div style={{ fontSize: '32px' }}>👑</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text)', marginBottom: '4px' }}>Elite</div>
+                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>₹499/month – AI Life Coach Pro, Team spaces</div>
+                  </div>
+                  <div style={{ color: '#BA7517', fontWeight: 600, fontSize: '0.9rem' }}>150 pts</div>
+                </motion.button>
+              </div>
+
+              <button
+                onClick={() => setShowPlanModal(false)}
+                style={{
+                  width: '100%', marginTop: '20px',
+                  padding: '14px', borderRadius: '12px',
+                  background: 'transparent', border: '1px solid var(--border)',
+                  color: 'var(--text-secondary)', cursor: 'pointer',
+                  fontWeight: 600, fontSize: '0.95rem',
+                }}
+              >
+                Cancel
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
