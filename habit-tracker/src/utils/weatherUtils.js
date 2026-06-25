@@ -3,14 +3,23 @@ const WEATHER_KEY = 'ht_weather';
 export const getUserLocation = () => {
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
-      resolve(null);
+      getIPLocation().then(resolve);
       return;
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
-      () => resolve(null)
+      () => getIPLocation().then(resolve)
     );
   });
+};
+
+const getIPLocation = async () => {
+  try {
+    const res = await fetch('http://ip-api.com/json/?fields=lat,lon');
+    const data = await res.json();
+    if (data.lat && data.lon) return { lat: data.lat, lon: data.lon };
+  } catch {}
+  return null;
 };
 
 export const fetchWeather = async (lat, lon) => {
