@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useHabitContext } from './context/HabitContext';
 import { useAuthContext } from './context/AuthContext';
@@ -107,12 +107,14 @@ function AppContent() {
     dismissInstall,
   } = usePWA();
 
+  const location = useLocation();
+  const currentPath = location.pathname;
+
   useEffect(() => {
     if (authLoading || isProfileLoading) return;
 
     const completed = localStorage.getItem('ht_onboarding_complete');
     const selectedPlan = localStorage.getItem('ht_selected_plan');
-    const currentPath = window.location.pathname;
 
     if (currentPath === '/auth/callback') return;
 
@@ -135,9 +137,8 @@ function AppContent() {
         }
       }
     }
-  }, [user, authLoading, isProfileLoading, navigate]);
+  }, [user, authLoading, isProfileLoading, navigate, currentPath]);
 
-  const currentPath = window.location.pathname;
   const hideNavigation = currentPath === '/landing' || currentPath === '/onboarding' || currentPath === '/auth/callback' || currentPath === '/login' || currentPath === '/forgot-password' || currentPath === '/reset-password';
 
   useEffect(() => {
