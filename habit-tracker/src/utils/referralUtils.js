@@ -13,7 +13,7 @@ const getReward = (plan) => {
   return 50;
 };
 
-export const applyReferralCode = (code) => {
+export const applyReferralCode = (code, plan) => {
   if (localStorage.getItem('ht_referral_used')) {
     return { success: false, reason: 'Already used a referral code' };
   }
@@ -22,7 +22,7 @@ export const applyReferralCode = (code) => {
   }
   localStorage.setItem('ht_referral_used', 'true');
   localStorage.setItem('ht_referred_by', code.toUpperCase());
-  const currentPlan = localStorage.getItem('ht_plan') || 'free';
+  const currentPlan = plan || localStorage.getItem('ht_plan') || 'free';
   const bonus = getReward(currentPlan);
   const prevBonus = parseInt(localStorage.getItem('ht_referral_bonus') || '0');
   localStorage.setItem('ht_referral_bonus', String(prevBonus + bonus));
@@ -45,12 +45,12 @@ export const saveReferralStats = (stats) => {
   localStorage.setItem('ht_referrals', JSON.stringify(stats));
 };
 
-export const generateShareableLink = () => {
-  const plan = localStorage.getItem('ht_plan') || 'free';
+export const generateShareableLink = (plan) => {
+  const currentPlan = plan || localStorage.getItem('ht_plan') || 'free';
   return {
     code: getCode(),
     link: `https://dailyhabits.app/join/${getCode()}`,
-    reward: getReward(plan),
+    reward: getReward(currentPlan),
   };
 };
 

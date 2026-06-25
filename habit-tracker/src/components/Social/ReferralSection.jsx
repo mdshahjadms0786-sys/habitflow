@@ -18,7 +18,7 @@ const ReferralSection = ({ compact = false }) => {
 
   const referralCode = getReferralCode();
   const stats = getReferralStats();
-  const shareData = generateShareableLink();
+  const shareData = generateShareableLink(currentPlan);
 
   const referralReward = currentPlan === 'elite' ? 150 : currentPlan === 'pro' ? 100 : 50;
 
@@ -33,7 +33,7 @@ const ReferralSection = ({ compact = false }) => {
       return;
     }
 
-    const result = applyReferralCode(codeInput);
+    const result = applyReferralCode(codeInput, currentPlan);
     if (result.success) {
       addPoints(result.bonus, 'Referral Bonus');
       toast.success(`🎉 You got ${result.bonus} free points!`);
