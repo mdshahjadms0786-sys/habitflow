@@ -37,7 +37,7 @@ const LandingPage = () => {
   const handleSelectPlan = (planId) => {
     setPlan(planId);
     localStorage.setItem('ht_selected_plan', planId);
-    navigate('/onboarding');
+    navigate('/login');
   };
 
   const containerVariants = {

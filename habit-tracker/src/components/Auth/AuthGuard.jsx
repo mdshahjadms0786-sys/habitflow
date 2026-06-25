@@ -8,6 +8,10 @@ export default function AuthGuard({ children, user, isLoading, onLogin, onSignup
     return children;
   }
 
+  if (location.pathname === '/login') {
+    return children;
+  }
+
   if (location.pathname === '/auth/callback') {
     return children;
   }

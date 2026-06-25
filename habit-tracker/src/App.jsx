@@ -68,6 +68,7 @@ const DNAEvolutionPage = lazy(() => import('./pages/DNAEvolutionPage'));
 const WhiteGloveOnboardingPage = lazy(() => import('./pages/WhiteGloveOnboardingPage'));
 const EliteDashboardPage = lazy(() => import('./pages/EliteDashboardPage'));
 const PointsPage = lazy(() => import('./pages/PointsPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
 
@@ -131,8 +132,8 @@ function AppContent() {
       if (!completed) {
         if (!selectedPlan && currentPath !== '/landing') {
           navigate('/landing', { replace: true });
-        } else if (selectedPlan && currentPath !== '/onboarding' && currentPath !== '/landing') {
-          navigate('/onboarding', { replace: true });
+        } else if (selectedPlan && currentPath !== '/login' && currentPath !== '/landing') {
+          navigate('/login', { replace: true });
         }
       }
     }
@@ -283,7 +284,7 @@ function AppContent() {
             <Route path="/white-glove" element={<PlanGuard requiredPlan="elite"><WhiteGloveOnboardingPage /></PlanGuard>} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/login" element={<Navigate to="/settings" replace />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/points" element={<PointsPage />} />
           </Routes>
           </Suspense>
