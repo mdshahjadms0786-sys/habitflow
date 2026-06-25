@@ -54,14 +54,3 @@ export const generateShareableLink = () => {
   };
 };
 
-export default {
-  getUserProfile,
-  createUserProfile,
-  updateUserProfile,
-  applyReferralCode,
-  addReferral,
-  getReferralStats,
-  generateShareableLink,
-  processReferralBonus,
-  REFERRAL_REWARD,
-};
