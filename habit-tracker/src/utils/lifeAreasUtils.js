@@ -34,6 +34,7 @@ export const LIFE_AREAS = [
     icon: '❤️', 
     color: '#E24B4A',
     description: 'Family, friends, social connections',
+    habitCategories: ['Personal'],
     keywords: ['family', 'friend', 'social', 'call', 'connect', 'relationship', 'partner', 'parent', 'child']
   },
   { 
@@ -51,6 +52,7 @@ export const LIFE_AREAS = [
     icon: '🎉', 
     color: '#EC4899',
     description: 'Hobbies, entertainment, joy',
+    habitCategories: [],
     keywords: ['hobby', 'game', 'fun', 'creative', 'music', 'art', 'play', 'entertain', 'leisure']
   },
   { 
@@ -59,6 +61,7 @@ export const LIFE_AREAS = [
     icon: '🙏', 
     color: '#7C3AED',
     description: 'Meditation, prayer, inner peace',
+    habitCategories: [],
     keywords: ['meditat', 'pray', 'spiritual', 'mindful', 'grateful', 'breath', 'yoga', 'chant', 'spiritual']
   },
   { 
@@ -67,6 +70,7 @@ export const LIFE_AREAS = [
     icon: '🏡', 
     color: '#10B981',
     description: 'Living space, nature, sustainability',
+    habitCategories: [],
     keywords: ['clean', 'organiz', 'home', 'nature', 'environment', 'plant', 'garden', 'sustain', 'recycle']
   }
 ];
