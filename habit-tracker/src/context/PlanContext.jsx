@@ -101,6 +101,7 @@ export const PlanProvider = ({ children }) => {
   useEffect(() => {
     const fetchPlanFromServer = async () => {
       if (!user) return
+      if (!supabase) return
       const { data, error } = await supabase
         .from('user_profiles')
         .select('plan')

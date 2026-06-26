@@ -538,13 +538,15 @@ export function canUseFeature(featureName) {
 export function getCurrentUsage(limitName) {
   const key = `ht_usage_${limitName}`;
   const stored = localStorage.getItem(key);
-  return parseInt(stored) || 0;
+  return parseInt(stored, 10) || 0;
 }
 
 export function incrementUsage(limitName, amount = 1) {
   const key = `ht_usage_${limitName}`;
   const current = getCurrentUsage(limitName);
-  localStorage.setItem(key, current + amount);
+  try {
+    localStorage.setItem(key, current + amount);
+  } catch {} // localStorage full or blocked
 }
 
 export function isPro() {
@@ -589,8 +591,11 @@ export function isTrialActive() {
   const trialStart = localStorage.getItem(TRIAL_KEY);
   if (!trialStart) return false;
 
+  const trialDate = new Date(trialStart).getTime();
+  if (isNaN(trialDate)) return false;
+
   const daysSinceTrial = Math.floor(
-    (Date.now() - new Date(trialStart).getTime()) / (1000 * 60 * 60 * 24)
+    (Date.now() - trialDate) / (1000 * 60 * 60 * 24)
   );
   return daysSinceTrial < TRIAL_DAYS;
 }
@@ -604,8 +609,11 @@ export function getTrialDaysRemaining() {
   const trialStart = localStorage.getItem(TRIAL_KEY);
   if (!trialStart) return 0;
 
+  const trialDate = new Date(trialStart).getTime();
+  if (isNaN(trialDate)) return 0;
+
   const daysSinceTrial = Math.floor(
-    (Date.now() - new Date(trialStart).getTime()) / (1000 * 60 * 60 * 24)
+    (Date.now() - trialDate) / (1000 * 60 * 60 * 24)
   );
   return Math.max(0, TRIAL_DAYS - daysSinceTrial);
 }
